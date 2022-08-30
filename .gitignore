@@ -128,5 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#SVN
+# SVN
 .svn/
+
+# Visual Studio
+.vs/
+
+# pytest
+TestResults/
