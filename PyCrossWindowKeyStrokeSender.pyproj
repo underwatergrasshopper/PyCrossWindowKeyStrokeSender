@@ -29,13 +29,16 @@
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="setup.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\__init__.py" />
     <Compile Include="tests\scenario_heyo.py" />
     <Compile Include="tests\test_common.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="Build.bat" />
     <Content Include="LICENSE" />
+    <Content Include="pyproject.toml" />
     <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
