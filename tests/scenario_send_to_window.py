@@ -24,7 +24,7 @@
 
 import PyCrossWindowKeyStrokeSender as cwkss
 
+cwkss.Sender.is_debug = True
+
 if __name__ == "__main__":
-    cwkss.print_heyo()
-
-
+    cwkss.send_to_window(b"*Untitled - Notepad")

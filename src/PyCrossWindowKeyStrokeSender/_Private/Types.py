@@ -21,10 +21,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
+from ctypes             import *
+from ctypes.wintypes    import *
 
-import PyCrossWindowKeyStrokeSender as cwkss
+################################################################################
+# WinApi Macros
+################################################################################
+def LOWORD(l):
+    return l & 0xffff
+    
+def HIWORD(l):
+    return (l >> 16) & 0xffff
 
-if __name__ == "__main__":
-    cwkss.print_heyo()
+################################################################################
+# WinApi Constatns
+################################################################################
+NULL = None
 
+################################################################################
+# WinApi Functions
+################################################################################
+GetLastError            = windll.kernel32.GetLastError 
+GetLastError.restype    = DWORD 
 
+FindWindowA             = windll.user32.FindWindowA 
+FindWindowA.argtypes    = [LPCSTR, LPCSTR]
+FindWindowA.restype     = HWND 
+
+FindWindowW             = windll.user32.FindWindowW 
+FindWindowW.argtypes    = [LPCWSTR, LPCWSTR]
+FindWindowW.restype     = HWND

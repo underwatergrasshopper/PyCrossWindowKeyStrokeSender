@@ -4,8 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>873cb820-b1e5-4ba8-aed3-8e83d0567a09</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>tests\scenario_send_to_window.py</StartupFile>
     <SearchPath>src;tests</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -14,6 +13,8 @@
     <TestFramework>pytest</TestFramework>
     <UnitTestPattern>test*.py</UnitTestPattern>
     <UnitTestRootDirectory>.</UnitTestRootDirectory>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>Global|PythonCore|3.9-32</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,13 +26,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\PyCrossWindowKeyStrokeSender\" />
+    <Folder Include="src\PyCrossWindowKeyStrokeSender\_Private\" />
     <Folder Include="tests\" />
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="setup.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\Commons.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\Exceptions.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\Sender.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\_Private\Types.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\_Private\__init__.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\__init__.py" />
     <Compile Include="tests\scenario_heyo.py" />
+    <Compile Include="tests\scenario_send_to_window.py" />
     <Compile Include="tests\test_common.py" />
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +48,9 @@
     <Content Include="LICENSE" />
     <Content Include="pyproject.toml" />
     <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.9-32" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

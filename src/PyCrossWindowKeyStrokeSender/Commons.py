@@ -21,10 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
+__all__ = [
+    "to_utf16"
+]
 
-import PyCrossWindowKeyStrokeSender as cwkss
-
-if __name__ == "__main__":
-    cwkss.print_heyo()
-
-
+def to_utf16(text):
+    """
+    text    : bytes or str
+    return  : str               Text in utf-16 encoding format.
+    """
+    if isinstance(text, bytes):
+        text = text.decode("utf-8")
+    return text.encode("utf-16").decode("utf-16")

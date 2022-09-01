@@ -21,10 +21,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
+from .Commons import *
 
-import PyCrossWindowKeyStrokeSender as cwkss
+__all__ = [
+    "ExcpetionBase",
+    "ExceptionCanNotFindTargetWindow",
+]
 
-if __name__ == "__main__":
-    cwkss.print_heyo()
+class ExcpetionBase(Exception):
+    def __init__(self, message):
+        super().__init__("CWKSS Error: %s" % message)
 
-
+class ExceptionCanNotFindTargetWindow(ExcpetionBase):
+    def __init__(self, window_name):
+        """
+        window_name : str or bytes
+        """
+        self.window_name = to_utf16(window_name)
+        super().__init__("Can not find target window with name \"%s\"." % self.window_name)
