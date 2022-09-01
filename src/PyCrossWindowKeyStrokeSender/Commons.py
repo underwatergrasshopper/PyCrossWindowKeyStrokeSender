@@ -22,8 +22,15 @@
 # SOFTWARE.
 ################################################################################
 __all__ = [
-    "to_utf16"
+    "to_utf16",
+    "debug_print",
 ]
+
+is_debug = False
+
+def debug_print(format, *params):
+    if is_debug:
+        print(format, *params)
 
 def to_utf16(text):
     """
