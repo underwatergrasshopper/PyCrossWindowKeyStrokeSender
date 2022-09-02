@@ -28,6 +28,10 @@ cwkss.Commons.is_debug = True
 
 if __name__ == "__main__":
     try:
+        # find window
+        #cwkss.send_to_window(b"*Untitled - Notepad")
+        #cwkss.send_to_window("*Untitled - Notepad")
+
         # undefined action type
         #cwkss.send_to_window(b"*Untitled - Notepad", (False))
 
@@ -37,9 +41,15 @@ if __name__ == "__main__":
         #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.POST, b"Some text.")
 
         # send text utf-16
-        #cwkss.send_to_window(b"*Untitled - Notepad", "Some text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.SEND, "Some text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.POST, "Some text.")
+        #cwkss.send_to_window("*Untitled - Notepad", "Some text.")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.SEND, "Some text.")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, "Some text.")
+
+        # wait
+        #cwkss.send_to_window("*Untitled - Notepad", "Some text.", cwkss.Wait(3), "Another text.")
+
+        # delay
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(1.0), "One. ", "Two. ", "Three. ", "Four. ")
 
         pass
     except cwkss.Fail as fail:

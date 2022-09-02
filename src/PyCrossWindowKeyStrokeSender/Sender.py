@@ -30,6 +30,8 @@ from enum               import Enum
 
 __all__ = [
     "ModeID",
+    "Wait",
+    "Delay",
     "send_to_window",
 ]
 
@@ -51,6 +53,21 @@ class ModeID(Enum):
     """
     SEND = 0
     POST = 1
+
+
+class Wait:
+    def __init__(self, wait_time):
+        """
+        wait_time : float       Time to wait in seconds.
+        """
+        self.wait_time = wait_time
+
+class Delay:
+    def __init__(self, delay_time):
+        """
+        delay_time : float      Delay time after sending each message in seconds.
+        """
+        self.delay_time = delay_time
 
 def send_to_window(target_window_name, *actions):
     """
@@ -170,18 +187,18 @@ def focus_and_send_messages(target_window, foreground_window, actions):
     
     SetFocus(foreground_window)
 
-def try_set_foreground_window(window):
-    mum_of_tires_left = 10
+def try_set_foreground_window(window, max_num_of_tries = 10, interval = 0.01):
+    num_of_tries_left = max_num_of_tries
 
-    while mum_of_tires_left:
+    while num_of_tries_left:
         if SetForegroundWindow(window):
-            debug_print("max_num_of_tries left: ", mum_of_tires_left)
+            debug_print("max_num_of_tries left: ", num_of_tries_left)
             return True
 
-        time.sleep(0.01)
-        mum_of_tires_left -= 1
+        time.sleep(interval)
+        num_of_tries_left -= 1
 
-    debug_print("max_num_of_tries left: ", mum_of_tires_left)
+    debug_print("max_num_of_tries left: ", num_of_tries_left)
     return False
 
 
@@ -192,7 +209,8 @@ def deliver_messages(focus_window, actions):
     """
     debug_print("actions: ", *actions)
 
-    mode_id = ModeID.SEND
+    mode_id     = ModeID.SEND
+    delay       = 0.0           # in seconds
 
     for action in actions:
         if isinstance(action, bytes):
@@ -207,8 +225,18 @@ def deliver_messages(focus_window, actions):
             debug_print("set mode_id: ", action.name)
             mode_id = action
 
+        elif isinstance(action, Wait):
+            debug_print("wait: ", action.wait_time)
+            time.sleep(action.wait_time)
+
+        elif isinstance(action, Delay):
+            debug_print("set delay: ", action.delay_time)
+            delay = action.delay_time
+
         else:
             raise UndefinedActionFail(type(action).__name__)
+
+        time.sleep(delay)
 
 
 def deliver_text(window, text, mode_id):
