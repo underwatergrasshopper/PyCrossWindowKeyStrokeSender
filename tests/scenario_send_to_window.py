@@ -27,4 +27,21 @@ import PyCrossWindowKeyStrokeSender as cwkss
 cwkss.Commons.is_debug = True
 
 if __name__ == "__main__":
-    cwkss.send_to_window(b"*Untitled - Notepad", (False))
+    try:
+        # undefined action type
+        #cwkss.send_to_window(b"*Untitled - Notepad", (False))
+
+        # send text ascii
+        #cwkss.send_to_window(b"*Untitled - Notepad", b"Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.SEND, b"Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.POST, b"Some text.")
+
+        # send text utf-16
+        #cwkss.send_to_window(b"*Untitled - Notepad", "Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.SEND, "Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.POST, "Some text.")
+
+        pass
+    except cwkss.Fail as fail:
+        print(fail)
+

@@ -26,17 +26,43 @@ from .Commons           import *
 from .Exceptions        import *
 
 import time
+from enum               import Enum
 
 __all__ = [
+    "ModeID",
     "send_to_window",
 ]
 
-def send_to_window(target_window_name, actions):
+"""
+Any action can be one of the following types.
+
+<Action>
+    bytes
+    str
+    ModeID
+    Input
+    Wait
+    Delay
+"""
+
+class ModeID(Enum):
     """
-    target_window_name : bytes or str       Name of window where messages will be sent. 
-                                            As str, when target window support wide characters (utf-16).
-                                            As bytes, otherwise.
-    raise                                   ExceptionCanNotFindTargetWindow
+    Message delivery mode.
+    """
+    SEND = 0
+    POST = 1
+
+def send_to_window(target_window_name, *actions):
+    """
+    Sends keyboard messages to target window.
+    target_window_name  : bytes or str      Name of window to which messages will be sent. 
+    actions             : <Action>, ...     Actions, which are containing messages to send and informations how to send messages. Each action is defined by it's type:
+                                                bytes   - Text message in ASCII encoding format.
+                                                          Note: Uses internally WinApi functions with suffix A. 
+                                                str     - Text message in UTF-16 encoding format.
+                                                          Note: Uses internally WinApi functions with suffix W. 
+                                                
+    raise                                   Any Exception which inherits from SendToWindowFail. For more details check Exceptions submodule module.
     """
     target_window = NULL
 
@@ -65,7 +91,8 @@ def send_to_window(target_window_name, actions):
 
 def send_to_window_by_handle(target_window, actions):
     """
-    target_window : HWND
+    target_window   : HWND
+    actions         : tuple(<Action>)
     """
     foreground_window = GetForegroundWindow();
 
@@ -107,9 +134,14 @@ def send_to_window_by_handle(target_window, actions):
     else:
         # When the target window is the caller window.
 
-        send_messages(target_window, actions)
+        deliver_messages(target_window, actions)
     
 def focus_and_send_messages(target_window, foreground_window, actions):
+    """
+    target_window       : HWND
+    foreground_window   : HWND
+    actions             : tuple(<Action>)
+    """
     if IsIconic(target_window):
        ShowWindow(target_window, SW_RESTORE)
     
@@ -125,27 +157,85 @@ def focus_and_send_messages(target_window, foreground_window, actions):
     if not focus_window: 
         GetWindowWithKeyboardFocusFail(True)
 
-    send_messages(focus_window, actions)
+    try:
+        deliver_messages(focus_window, actions)
+    except SendToWindowFail:
+        try_set_foreground_window(foreground_window)
+        raise
 
-    is_success = SetForegroundWindow(foreground_window)
-
-    max_num_of_tries = 10
-    while not is_success and max_num_of_tries:
-        time.sleep(0.01)
-        is_success = SetForegroundWindow(foreground_window)
-        max_num_of_tries -= 1
-
-    debug_print("max_num_of_tries left: ", max_num_of_tries)
+    is_success = try_set_foreground_window(foreground_window)
 
     if not is_success:
         raise SetCallerWindowToForegroundFail(True)
     
     SetFocus(foreground_window)
 
+def try_set_foreground_window(window):
+    mum_of_tires_left = 10
 
-def send_messages(focus_window, actions):
-    # TODO: Implement!!!
-    pass
+    while mum_of_tires_left:
+        if SetForegroundWindow(window):
+            debug_print("max_num_of_tries left: ", mum_of_tires_left)
+            return True
+
+        time.sleep(0.01)
+        mum_of_tires_left -= 1
+
+    debug_print("max_num_of_tries left: ", mum_of_tires_left)
+    return False
 
 
+def deliver_messages(focus_window, actions):
+    """
+    focus_window        : HWND
+    actions             : tuple(<Action>)
+    """
+    debug_print("actions: ", *actions)
+
+    mode_id = ModeID.SEND
+
+    for action in actions:
+        if isinstance(action, bytes):
+            debug_print("process ascii message")
+            deliver_text(focus_window, action, mode_id)
+
+        elif isinstance(action, str):
+            debug_print("process utf-16 message")
+            deliver_text(focus_window, action, mode_id)
+
+        elif isinstance(action, ModeID):
+            debug_print("set mode_id: ", action.name)
+            mode_id = action
+
+        else:
+            raise UndefinedActionFail(type(action).__name__)
+
+
+def deliver_text(window, text, mode_id):
+    debug_print("mode_id: ", mode_id.name)
+
+    if isinstance(text, bytes):
+        if mode_id == ModeID.SEND:
+            for sign in text:
+                SendMessageA(window, WM_CHAR, sign, 0)
+
+        elif mode_id == ModeID.POST:
+            for sign in text:
+                if not PostMessageA(window, WM_CHAR, sign, 0):
+                    raise DelivarMessageFail("\"%s\"" % to_utf16(text))
+        else:
+            raise UndefinedMessageDeliveryModeFail(mode_id)
+    else: # as utf-16
+        text = to_utf16(text)
+
+        if mode_id == ModeID.SEND:
+            for sign in text:
+                SendMessageW(window, WM_CHAR, ord(sign), 0)
+
+        elif mode_id == ModeID.POST:
+            for sign in text:
+                if not PostMessageW(window, WM_CHAR, ord(sign), 0):
+                    raise DelivarMessageFail("\"%s\"" % text)
+        else:
+            raise UndefinedMessageDeliveryModeFail(mode_id)
 

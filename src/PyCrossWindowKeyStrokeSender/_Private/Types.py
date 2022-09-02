@@ -48,6 +48,10 @@ ULONG_PTR               = WPARAM
 
 SW_RESTORE              = 9
 
+WM_CHAR                 = 0x0102
+WM_KEYDOWN              = 0x0100
+WM_KEYUP                = 0x0101
+
 ### SendInput ###
 INPUT_MOUSE             = 0
 INPUT_KEYBOARD          = 1

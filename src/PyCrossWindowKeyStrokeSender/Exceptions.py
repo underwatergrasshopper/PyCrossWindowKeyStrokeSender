@@ -29,7 +29,7 @@ from enum               import Enum
 __all__ = [
     "Fail",
     "SendToWindowFail",
-    "SendMessageFail",
+    "DelivarMessageFail",
     "FindTargetWindowFail",
     "FindForegroundWindowFail",
     "ReceiveTargetWindowThreadIdFail",
@@ -39,6 +39,8 @@ __all__ = [
     "GetWindowWithKeyboardFocusFail",
     "SetCallerWindowToForegroundFail",
     "DetachCallerFromTargetFail",
+    "UndefinedActionFail",
+    "UndefinedMessageDeliveryModeFail",
 ]
 
 class Fail(Exception):
@@ -65,12 +67,13 @@ class SendToWindowFail(Fail):
         """
         super().__init__(message, is_last_error)
 
-class SendMessageFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
+class DelivarMessageFail(SendToWindowFail):
+    def __init__(self, message, is_last_error = False):
         """
+        message         : str
         is_last_error   : bool
         """
-        super().__init__("Can not send message.", is_last_error)
+        super().__init__("Can not deliver %s message." % message, is_last_error)
 
 class FindTargetWindowFail(SendToWindowFail):
     def __init__(self, window_name, is_last_error = False):
@@ -135,6 +138,19 @@ class DetachCallerFromTargetFail(SendToWindowFail):
         """
         super().__init__("Can not detach caller window thread from target window thread.", is_last_error)
 
+class UndefinedActionFail(SendToWindowFail):
+    def __init__(self, undefined_action_name, is_last_error = False):
+        """
+        undefined_action_name   : str
+        is_last_error           : bool
+        """
+        super().__init__("Can not process undefined action for \"%s\" argument type." % undefined_action_name, is_last_error)
 
-
+class UndefinedMessageDeliveryModeFail(SendToWindowFail):
+    def __init__(self, mode_id, is_last_error = False):
+        """
+        mode_id         : ModeID
+        is_last_error   : bool
+        """
+        super().__init__("Can not process undefined message delivery mode %s." % mode_id.name, is_last_error)
 
