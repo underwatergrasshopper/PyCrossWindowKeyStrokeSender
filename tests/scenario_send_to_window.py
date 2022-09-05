@@ -55,6 +55,7 @@ if __name__ == "__main__":
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, cwkss.Delay(0.1), "Some text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP), "Another text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP))
         #cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
+        #cwkss.send_to_window("Path of Exile", cwkss.ModeID.POST, cwkss.Delay(0.01), cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
         #cwkss.send_to_window("Path of Exile", cwkss.ModeID.POST, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
 
         pass

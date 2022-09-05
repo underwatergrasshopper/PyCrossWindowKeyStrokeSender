@@ -445,13 +445,29 @@ def deliver_messages(focus_window, actions):
     delay       = 0.0           # in seconds
 
     for action in actions:
-        if isinstance(action, bytes):
+        if isinstance(action, bytes): # acii text
             debug_print("process ascii message")
             deliver_text(focus_window, action, mode_id)
 
-        elif isinstance(action, str):
+            time.sleep(delay)
+
+        elif isinstance(action, str): # utf-16 text
             debug_print("process utf-16 message")
             deliver_text(focus_window, action, mode_id)
+
+            time.sleep(delay)
+
+        elif isinstance(action, Key): # key
+            debug_print("process key message: ", action.name)
+            deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, mode_id)
+
+            time.sleep(delay)
+             
+        elif isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int): # key
+            debug_print("process key message: ", action[0].name)
+            deliver_key(focus_window, action[0], action[1], mode_id)
+
+            time.sleep(delay)
 
         elif isinstance(action, ModeID):
             debug_print("set mode_id: ", action.name)
@@ -465,18 +481,10 @@ def deliver_messages(focus_window, actions):
             debug_print("set delay: ", action.delay_time)
             delay = action.delay_time
 
-        elif isinstance(action, Key):
-            debug_print("process key message: ", action.name)
-            deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, mode_id)
-             
-        elif isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int):
-            debug_print("process key message: ", action[0].name)
-            deliver_key(focus_window, action[0], action[1], mode_id)
-
         else:
             raise UndefinedActionFail(type(action).__name__)
 
-        time.sleep(delay)
+        
 
 
 def deliver_text(window, text, mode_id):
