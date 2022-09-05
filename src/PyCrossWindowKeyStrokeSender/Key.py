@@ -143,7 +143,7 @@ class Key(Enum):
 def key_to_vk_code(key):
     """
     key : Key
-    return int
+    return int      WinApi Virtual Key Code.
     """
     return {
         Key.BACKSPACE           : VK_BACK,             

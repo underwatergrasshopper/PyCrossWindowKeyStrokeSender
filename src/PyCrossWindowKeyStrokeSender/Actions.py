@@ -21,40 +21,64 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
-import inspect
+from ._Private.Types    import *
+from .Commons           import *
+from .Key               import *
+
+from enum import Enum
 
 __all__ = [
-    "to_utf16",
-    "to_bytes",
-    "debug_print",
+    "Key",
+    "key_to_vk_code",
+    "KeyAction",
+    "DeliveryTypeID",
+    "SEND",
+    "POST",
+    "EncodingTypeID",
+    "ASCII",
+    "UTF16",
+    "Wait",
+    "Delay",
 ]
 
-is_debug = False
+class KeyAction:
+    """
+    Sets of bit for bitfield.
+    """
+    DOWN        = 0x01
+    UP          = 0x02
+    DOWN_AND_UP = DOWN | UP
 
-def debug_print(*params):
+class DeliveryTypeID(Enum):
     """
-    params : arg, ...       Same arguments as for print function.
+    Message delivery type.
     """
-    if is_debug:
-        caller_function_name = inspect.currentframe().f_back.f_code.co_name
-        print("[" + caller_function_name + "]", *params)
+    SEND = 0
+    POST = 1
 
-def to_utf16(text):
-    """
-    text    : bytes or str
-    return  : str               Text in utf-16 encoding format.
-    """
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
-    return text.encode("utf-16").decode("utf-16")
+SEND = DeliveryTypeID.SEND
+POST = DeliveryTypeID.POST
 
-def to_bytes(text):
+class EncodingTypeID(Enum):
     """
-    text    : bytes or str
-    return  : bytes             Text in ascii format.
+    Text message encoding format type.
     """
-    if isinstance(text, bytes):
-        return text
-    return text.encode("utf-8")
+    ASCII = 0
+    UTF16 = 1
 
+ASCII = EncodingTypeID.ASCII
+UTF16 = EncodingTypeID.UTF16
 
+class Wait:
+    def __init__(self, wait_time):
+        """
+        wait_time : float       Time to wait in seconds.
+        """
+        self.wait_time = wait_time
+
+class Delay:
+    def __init__(self, delay_time):
+        """
+        delay_time : float      Delay time after sending each message in seconds.
+        """
+        self.delay_time = delay_time

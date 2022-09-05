@@ -41,6 +41,7 @@ __all__ = [
     "DetachCallerFromTargetFail",
     "UndefinedActionFail",
     "UndefinedMessageDeliveryModeFail",
+    "UndefinedMessageEncodingFormatFail",
 ]
 
 class Fail(Exception):
@@ -147,10 +148,19 @@ class UndefinedActionFail(SendToWindowFail):
         super().__init__("Can not process undefined action for \"%s\" argument type." % undefined_action_name, is_last_error)
 
 class UndefinedMessageDeliveryModeFail(SendToWindowFail):
-    def __init__(self, mode_id, is_last_error = False):
+    def __init__(self, delivery_type_id, is_last_error = False):
         """
-        mode_id         : ModeID
-        is_last_error   : bool
+        delivery_type_id    : DelivaryTypeID
+        is_last_error       : bool
         """
-        super().__init__("Can not process undefined message delivery mode %s." % mode_id.name, is_last_error)
+        super().__init__("Can not process undefined message delivery type %s." % delivery_type_id.name, is_last_error)
 
+class UndefinedMessageEncodingFormatFail(SendToWindowFail):
+    def __init__(self, encoding_type_id, is_last_error = False):
+        """
+        encoding_type_id    : EncodingTypeID
+        is_last_error       : bool
+        """
+        super().__init__("Can not process undefined message encoding type %s." % encoding_type_id.name, is_last_error)
+
+        

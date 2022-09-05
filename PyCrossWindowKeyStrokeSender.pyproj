@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="setup.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\Actions.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Commons.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Exceptions.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Key.py" />

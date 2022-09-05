@@ -36,14 +36,15 @@ if __name__ == "__main__":
         #cwkss.send_to_window(b"*Untitled - Notepad", (False))
 
         # send text ascii
-        #cwkss.send_to_window(b"*Untitled - Notepad", b"Some text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.SEND, b"Some text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ModeID.POST, b"Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, cwkss.SEND, b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, cwkss.POST, b"Some text.", "Other text.")
 
         # send text utf-16
-        #cwkss.send_to_window("*Untitled - Notepad", "Some text.")
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.SEND, "Some text.")
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, "Some text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, cwkss.SEND, b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, cwkss.POST, b"Some text.", "Other text.")
 
         # wait
         #cwkss.send_to_window("*Untitled - Notepad", "Some text.", cwkss.Wait(3), "Another text.")
@@ -52,11 +53,13 @@ if __name__ == "__main__":
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(1.0), "One. ", "Two. ", "Three. ", "Four. ")
 
         # key
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ModeID.POST, cwkss.Delay(0.1), "Some text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP), "Another text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP))
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ASCII, cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.UTF16, cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.POST, cwkss.Delay(0.1), "Some text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP), "Another text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP))
         #cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
-        #cwkss.send_to_window("Path of Exile", cwkss.ModeID.POST, cwkss.Delay(0.01), cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
-        #cwkss.send_to_window("Path of Exile", cwkss.ModeID.POST, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
+        #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Delay(0.01), cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
+        #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
 
         pass
     except cwkss.Fail as fail:

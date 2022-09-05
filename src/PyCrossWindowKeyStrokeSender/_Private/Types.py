@@ -254,3 +254,8 @@ SendInput.restype                   = UINT
 MapVirtualKeyA                      = windll.user32.MapVirtualKeyA 
 MapVirtualKeyA.argtypes             = [UINT, UINT]
 MapVirtualKeyA.restype              = UINT  
+
+MapVirtualKeyW                      = windll.user32.MapVirtualKeyW 
+MapVirtualKeyW.argtypes             = [UINT, UINT]
+MapVirtualKeyW.restype              = UINT  
+

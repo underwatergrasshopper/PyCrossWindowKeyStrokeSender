@@ -21,20 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
-from turtle import down, up
 from ._Private.Types    import *
 from .Commons           import *
 from .Exceptions        import *
-from .Key               import *
+from .Actions           import *
 
 import time
 from enum               import Enum
 
 __all__ = [
-    "ModeID",
-    "Wait",
-    "Delay",
-    "KeyAction",
     "send_to_window",
 ]
 
@@ -44,40 +39,12 @@ Any action can be one of the following types.
 <Action>
     bytes
     str
-    ModeID
+    DeliveryTypeID
+    EncodingTypeID
     Input
     Wait
     Delay
 """
-
-class ModeID(Enum):
-    """
-    Message delivery mode.
-    """
-    SEND = 0
-    POST = 1
-
-class Wait:
-    def __init__(self, wait_time):
-        """
-        wait_time : float       Time to wait in seconds.
-        """
-        self.wait_time = wait_time
-
-class Delay:
-    def __init__(self, delay_time):
-        """
-        delay_time : float      Delay time after sending each message in seconds.
-        """
-        self.delay_time = delay_time
-
-class KeyAction:
-    """
-    Sets of bit for bitfield.
-    """
-    DOWN        = 0x01
-    UP          = 0x02
-    DOWN_AND_UP = DOWN | UP
 
 def send_to_window(target_window_name, *actions):
     """
@@ -219,37 +186,36 @@ def deliver_messages(focus_window, actions):
     """
     debug_print("actions: ", *actions)
 
-    mode_id     = ModeID.SEND
-    delay       = 0.0           # in seconds
+    encoding_type_id        = EncodingTypeID.ASCII
+    delivery_type_id        = DeliveryTypeID.SEND
+    delay                   = 0.0           # in seconds
 
     for action in actions:
-        if isinstance(action, bytes): # acii text
-            debug_print("process ascii message")
-            deliver_text(focus_window, action, mode_id)
-
-            time.sleep(delay)
-
-        elif isinstance(action, str): # utf-16 text
-            debug_print("process utf-16 message")
-            deliver_text(focus_window, action, mode_id)
+        if isinstance(action, (bytes, str)): # text
+            debug_print("process text message")
+            deliver_text(focus_window, action, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
 
         elif isinstance(action, Key): # key
             debug_print("process key message: ", action.name)
-            deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, mode_id)
+            deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
              
         elif isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int): # key
             debug_print("process key message: ", action[0].name)
-            deliver_key(focus_window, action[0], action[1], mode_id)
+            deliver_key(focus_window, action[0], action[1], encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
 
-        elif isinstance(action, ModeID):
-            debug_print("set mode_id: ", action.name)
-            mode_id = action
+        elif isinstance(action, EncodingTypeID):
+            debug_print("set encoding_type_id: ", action.name)
+            encoding_type_id = action
+
+        elif isinstance(action, DeliveryTypeID):
+            debug_print("set delivery_type_id: ", action.name)
+            delivery_type_id = action
 
         elif isinstance(action, Wait):
             debug_print("wait: ", action.wait_time)
@@ -262,76 +228,93 @@ def deliver_messages(focus_window, actions):
         else:
             raise UndefinedActionFail(type(action).__name__)
 
-        
 
-
-def deliver_text(window, text, mode_id):
+def deliver_text(window, text, encoding_type_id, delivery_type_id):
     """
-    window      : HWND
-    text        : str or bytes
-    mode_id     : ModeID
+    window              : HWND
+    text                : str or bytes
+    encoding_type_id    : EncodingTypeID
+    delivery_type_id    : DeliveryTypeID
     """
-    debug_print("mode_id: ", mode_id.name)
+    debug_print("encoding_type_id: ", encoding_type_id.name)
+    debug_print("delivery_type_id: ", delivery_type_id.name)
 
-    if isinstance(text, bytes):
-        if mode_id == ModeID.SEND:
+    if encoding_type_id == EncodingTypeID.ASCII:
+        text = to_bytes(text)
+
+        if delivery_type_id == DeliveryTypeID.SEND:
             for sign in text:
                 SendMessageA(window, WM_CHAR, sign, 0)
 
-        elif mode_id == ModeID.POST:
+        elif delivery_type_id == DeliveryTypeID.POST:
             for sign in text:
                 if not PostMessageA(window, WM_CHAR, sign, 0):
                     raise DelivarMessageFail("\"%s\"" % to_utf16(text))
         else:
-            raise UndefinedMessageDeliveryModeFail(mode_id)
-    else: # as utf-16
+            raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+    elif encoding_type_id == EncodingTypeID.UTF16:
         text = to_utf16(text)
 
-        if mode_id == ModeID.SEND:
+        if delivery_type_id == DeliveryTypeID.SEND:
             for sign in text:
                 SendMessageW(window, WM_CHAR, ord(sign), 0)
 
-        elif mode_id == ModeID.POST:
+        elif delivery_type_id == DeliveryTypeID.POST:
             for sign in text:
                 if not PostMessageW(window, WM_CHAR, ord(sign), 0):
                     raise DelivarMessageFail("\"%s\"" % text)
         else:
-            raise UndefinedMessageDeliveryModeFail(mode_id)
+            raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+    else:
+        raise UndefinedMessageEncodingFormatFail(encoding_type_id)
 
-def deliver_key(window, key, key_action, mode_id):
+def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
     """
-    window      : HWND
-    key         : Key
-    key_action  : int           Bifield of KeyAction bits.
-    mode_id     : ModeID
+    window              : HWND
+    key                 : Key
+    key_action          : int               Bifield made from KeyAction bit sets.
+    encoding_type_id    : EncodingTypeID
+    delivery_type_id    : DeliveryTypeID
     """
-    debug_print("mode_id: ", mode_id.name)
+    debug_print("encoding_type_id: ", encoding_type_id.name)
+    debug_print("delivery_type_id: ", delivery_type_id.name)
+
+    if encoding_type_id == EncodingTypeID.ASCII:
+        SendMessage     = SendMessageA
+        PostMessage     = PostMessageA
+        MapVirtualKey   = MapVirtualKeyA
+    elif encoding_type_id == EncodingTypeID.UTF16:
+        SendMessage     = SendMessageW
+        PostMessage     = PostMessageW
+        MapVirtualKey   = MapVirtualKeyW
+    else:
+        raise UndefinedMessageEncodingFormatFail(encoding_type_id)
 
     vk_code       = key_to_vk_code(key)
 
-    scan_code     = MapVirtualKeyA(vk_code, MAPVK_VK_TO_VSC);
+    scan_code     = MapVirtualKey(vk_code, MAPVK_VK_TO_VSC);
 
     l_param_down  = 0x00000001 | (scan_code  << 16);
     l_param_up    = 0xC0000001 | (scan_code  << 16);
 
-    if mode_id == ModeID.SEND:
+    if delivery_type_id == DeliveryTypeID.SEND:
         if key_action & KeyAction.DOWN:
             debug_print("DOWN")
-            SendMessageA(window, WM_KEYDOWN, vk_code, l_param_down)
+            SendMessage(window, WM_KEYDOWN, vk_code, l_param_down)
 
         if key_action & KeyAction.UP:
             debug_print("UP")
-            SendMessageA(window, WM_KEYUP, vk_code, l_param_up)
+            SendMessage(window, WM_KEYUP, vk_code, l_param_up)
 
-    elif mode_id == ModeID.POST:
+    elif delivery_type_id == DeliveryTypeID.POST:
         if key_action & KeyAction.DOWN:
             debug_print("DOWN")
-            if not PostMessageA(window, WM_KEYDOWN, vk_code, l_param_down):
+            if not PostMessage(window, WM_KEYDOWN, vk_code, l_param_down):
                 raise DelivarMessageFail("%s DOWN" % key_to_vk_code(key))
 
         if key_action & KeyAction.UP:
             debug_print("UP")
-            if not PostMessageA(window, WM_KEYUP, vk_code, l_param_up):
+            if not PostMessage(window, WM_KEYUP, vk_code, l_param_up):
                 raise DelivarMessageFail("%s UP" % key_to_vk_code(key))
     else:
-        raise UndefinedMessageDeliveryModeFail(mode_id)
+        raise UndefinedMessageDeliveryModeFail(delivery_type_id)
