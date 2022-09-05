@@ -25,12 +25,16 @@ import inspect
 
 __all__ = [
     "to_utf16",
+    "to_bytes",
     "debug_print",
 ]
 
 is_debug = False
 
 def debug_print(*params):
+    """
+    params : arg, ...       Same arguments as for print function.
+    """
     if is_debug:
         caller_function_name = inspect.currentframe().f_back.f_code.co_name
         print("[" + caller_function_name + "]", *params)
@@ -43,3 +47,12 @@ def to_utf16(text):
     if isinstance(text, bytes):
         text = text.decode("utf-8")
     return text.encode("utf-16").decode("utf-16")
+
+def to_bytes(text):
+    """
+    text    : bytes or str
+    return  : bytes             Text in ascii format.
+    """
+    if isinstance(text, bytes):
+        return text
+    return text.encode("utf-8")

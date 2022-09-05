@@ -23,6 +23,7 @@
 ################################################################################
 from .Commons       import *
 from .Exceptions    import *
+from .Key           import *
 from .Sender        import *
 
 def print_heyo():

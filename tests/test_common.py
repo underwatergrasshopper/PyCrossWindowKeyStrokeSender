@@ -33,3 +33,9 @@ def test_to_utf16():
     assert(cwkss.to_utf16("abc") == u"abc")
     assert(cwkss.to_utf16(u"abc") == u"abc")
     assert(cwkss.to_utf16(U"abc") == u"abc")
+
+def test_to_bytes():
+    assert(cwkss.to_bytes(b"abc") == b"abc")
+    assert(cwkss.to_bytes("abc") == b"abc")
+    assert(cwkss.to_bytes(u"abc") == b"abc")
+    assert(cwkss.to_bytes(U"abc") == b"abc")
