@@ -33,19 +33,6 @@ __all__ = [
     "send_to_window",
 ]
 
-"""
-Any action can be one of the following types.
-
-<Action>
-    bytes
-    str
-    DeliveryTypeID
-    EncodingTypeID
-    Input
-    Wait
-    Delay
-"""
-
 def send_to_window(target_window_name, *actions):
     """
     Sends keyboard messages to target window.
@@ -55,6 +42,7 @@ def send_to_window(target_window_name, *actions):
                                                           Note: Uses internally WinApi functions with suffix A. 
                                                 str     - Text message in UTF-16 encoding format.
                                                           Note: Uses internally WinApi functions with suffix W. 
+                                            Note: Input text is utf-16 only? and key messages also?
                                                 
     raise                                   Any Exception which inherits from SendToWindowFail. For more details check Exceptions submodule module.
     """
@@ -178,6 +166,8 @@ def try_set_foreground_window(window, max_num_of_tries = 10, interval = 0.01):
     debug_print("max_num_of_tries left: ", num_of_tries_left)
     return False
 
+def is_key_and_key_action_tuple(action):
+    return isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int)
 
 def deliver_messages(focus_window, actions):
     """
@@ -192,20 +182,26 @@ def deliver_messages(focus_window, actions):
 
     for action in actions:
         if isinstance(action, (bytes, str)): # text
-            debug_print("process text message")
+            debug_print("deliver text message")
             deliver_text(focus_window, action, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
 
         elif isinstance(action, Key): # key
-            debug_print("process key message: ", action.name)
+            debug_print("deliver key message: ", action.name)
             deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
              
-        elif isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int): # key
-            debug_print("process key message: ", action[0].name)
+        elif is_key_and_key_action_tuple(action): # key
+            debug_print("deliver key message: ", action[0].name)
             deliver_key(focus_window, action[0], action[1], encoding_type_id, delivery_type_id)
+
+            time.sleep(delay)
+
+        elif isinstance(action, Input): # input
+            debug_print("deliver input message: ", action.actions)
+            deliver_input(focus_window, action.actions)
 
             time.sleep(delay)
 
@@ -219,6 +215,7 @@ def deliver_messages(focus_window, actions):
 
         elif isinstance(action, Wait):
             debug_print("wait: ", action.wait_time)
+
             time.sleep(action.wait_time)
 
         elif isinstance(action, Delay):
@@ -318,3 +315,97 @@ def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
                 raise DelivarMessageFail("%s UP" % key_to_vk_code(key))
     else:
         raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+
+def deliver_input(window, actions):
+    """
+    window      : HWND
+    actions     : tuple(<SimpleMessage>)
+    """
+    inputs = [] # list(INPUT)
+
+    for action in actions:
+        if isinstance(action, (bytes, str)): # text
+            inputs += make_text_input(action)
+        elif isinstance(action, Key): # key
+            inputs += make_key_input(action, KeyAction.DOWN_AND_UP)
+        elif is_key_and_key_action_tuple(action): # key
+            inputs += make_key_input(action[0], action[1])
+        else:
+            raise UndefinedActionFail(type(action).__name__)
+
+    length = len(inputs)
+    raw_inputs = (INPUT * length)(*inputs)  # ctypes requires specific type for array
+
+    count = SendInput(length, raw_inputs, sizeof(INPUT))
+    if count != length:
+        raise DelivarMessageFail(str(actions) + " input")
+
+
+def make_text_input(text):
+    """
+    text : bytes or str
+    return list(INPUT)
+    """
+    inputs = [] # INPUT
+
+    text = to_utf16(text)
+
+    for sign in text:
+        input = INPUT()
+
+        input.type              = INPUT_KEYBOARD
+        input.ki.wVk            = 0
+        input.ki.wScan          = ord(sign)
+        input.ki.time           = 0
+        input.ki.dwFlags        = KEYEVENTF_UNICODE
+        input.ki.dwExtraInfo    = 0
+
+        inputs += [input]
+
+        input = INPUT()
+
+        input.type              = INPUT_KEYBOARD
+        input.ki.wVk            = 0
+        input.ki.wScan          = ord(sign)
+        input.ki.time           = 0
+        input.ki.dwFlags        = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP
+        input.ki.dwExtraInfo    = 0
+
+        inputs += [input]
+
+    return inputs
+
+def make_key_input(key, key_action):
+    """
+    key         : Key
+    key_action  : KeyAction
+    return list(INPUT)
+    """
+    inputs = [] # INPUT
+
+    if key_action & KeyAction.DOWN:
+        input = INPUT()
+
+        input.type              = INPUT_KEYBOARD
+        input.ki.wVk            = VK_RETURN
+        input.ki.wScan          = 0
+        input.ki.time           = 0
+        input.ki.dwFlags        = 0
+        input.ki.dwExtraInfo    = 0
+
+        inputs += [input]
+
+    if key_action & KeyAction.UP:
+        input = INPUT()
+
+        input.type              = INPUT_KEYBOARD
+        input.ki.wVk            = VK_RETURN
+        input.ki.wScan          = 0
+        input.ki.time           = 0
+        input.ki.dwFlags        = KEYEVENTF_KEYUP
+        input.ki.dwExtraInfo    = 0
+
+        inputs += [input]
+
+    return inputs
+

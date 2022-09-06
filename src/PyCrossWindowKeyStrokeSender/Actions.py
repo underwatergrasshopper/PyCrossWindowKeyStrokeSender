@@ -31,6 +31,7 @@ __all__ = [
     "Key",
     "key_to_vk_code",
     "KeyAction",
+    "Input",
     "DeliveryTypeID",
     "SEND",
     "POST",
@@ -41,6 +42,31 @@ __all__ = [
     "Delay",
 ]
 
+"""
+An action can be one of the following types.
+
+<Action>
+    <Message>
+    DeliveryTypeID
+    EncodingTypeID
+    Input
+    Wait
+    Delay
+
+<Message>
+    <SimpleMessage>
+    Input
+
+<SimpleMessage>
+    <Text>
+    Key
+    tuple(Key, KeyAction)
+
+<Text>
+    str
+    bytes
+"""
+
 class KeyAction:
     """
     Sets of bit for bitfield.
@@ -48,6 +74,15 @@ class KeyAction:
     DOWN        = 0x01
     UP          = 0x02
     DOWN_AND_UP = DOWN | UP
+
+class Input:
+    actions = () # tuple(<SimpleMessage>)
+
+    def __init__(self, *actions):
+        """
+        actions : <SimpleMessage>, ...        Only simple message actions are allowed: str, bytes, Key, tuple(Key, KeyAction).
+        """
+        self.actions = actions
 
 class DeliveryTypeID(Enum):
     """
