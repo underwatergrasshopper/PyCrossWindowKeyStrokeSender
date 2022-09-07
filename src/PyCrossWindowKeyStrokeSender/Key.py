@@ -29,118 +29,118 @@ from enum import Enum
 __all__ = [
     "Key",
     "key_to_vk_code",
-    # "vk_code_to_sideless", # Note: Left and right specific special keys are not supported.  Maybe in future.
+    "vk_code_to_sideless",
     "is_special_key",
 ]
 
 class Key(Enum):
-    BACKSPACE           = 0
-    TAB                 = 1
-    ENTER               = 2 
-    SHIFT               = 3 
-    CTRL                = 4 
-    ALT                 = 5 
-    PAUSE               = 6
-    CAPS_LOCK           = 7
-    ESCAPE              = 8
-    SPACE               = 9        
-    PAGE_UP             = 10
-    PAGE_DOWN           = 11
-    END                 = 12
-    HOME                = 13
-    ARROW_LEFT          = 14
-    ARROW_UP            = 15
-    ARROW_RIGHT         = 16
-    ARROW_DOWN          = 17
-    PRINT               = 18
-    PRINT_SCREEN        = 19
-    INSERT              = 20
-    DELETE              = 21   
-    _0                  = 22
-    _1                  = 23
-    _2                  = 24
-    _3                  = 25
-    _4                  = 26
-    _5                  = 27
-    _6                  = 28
-    _7                  = 29
-    _8                  = 30
-    _9                  = 31
-    A                   = 32
-    B                   = 33
-    C                   = 34
-    D                   = 35
-    E                   = 36
-    F                   = 37
-    G                   = 38
-    H                   = 39
-    I                   = 40
-    J                   = 41
-    K                   = 42
-    L                   = 43
-    M                   = 44
-    N                   = 45
-    O                   = 46
-    P                   = 47
-    Q                   = 48
-    R                   = 49
-    S                   = 50
-    T                   = 51
-    U                   = 52
-    V                   = 53
-    W                   = 54
-    X                   = 55
-    Y                   = 56
-    Z                   = 57            
-    NUMPAD_0            = 58
-    NUMPAD_1            = 59
-    NUMPAD_2            = 60
-    NUMPAD_3            = 61
-    NUMPAD_4            = 62
-    NUMPAD_5            = 63
-    NUMPAD_6            = 64
-    NUMPAD_7            = 65
-    NUMPAD_8            = 66
-    NUMPAD_9            = 67
-    NUMPAD_MULTIPLY     = 68
-    NUMPAD_ADD          = 69
-    NUMPAD_SEPARATOR    = 70
-    NUMPAD_SUBTRACT     = 71
-    NUMPAD_DECIMAL      = 72
-    NUMPAD_DIVIDE       = 73
-    F1                  = 74
-    F2                  = 75
-    F3                  = 76
-    F4                  = 77
-    F5                  = 78
-    F6                  = 79
-    F7                  = 80
-    F8                  = 81
-    F9                  = 82
-    F10                 = 83
-    F11                 = 84
-    F12                 = 85
-    F13                 = 86
-    F14                 = 87
-    F15                 = 88
-    F16                 = 89
-    F17                 = 90
-    F18                 = 91
-    F19                 = 92
-    F20                 = 93
-    F21                 = 94
-    F22                 = 95
-    F23                 = 96
-    F24                 = 97
-    NUM_LOCK            = 98
-    SCROLL_LOCK         = 99
-    # Note: Left and right specific special keys are not supported.  Maybe in future.
-    #LSHIFT              = 100
-    #RSHIFT              = 101
-    #LCTRL               = 102
-    #RCTRL               = 103
-    #LALT                = 104
-    #RALT                = 105
+    BREAK               = 0
+    BACKSPACE           = 1
+    TAB                 = 2 
+    ENTER               = 3 
+    SHIFT               = 4 
+    CTRL                = 5 
+    ALT                 = 6
+    PAUSE               = 7
+    CAPS_LOCK           = 8
+    ESCAPE              = 9  
+    SPACE               = 10      
+    PAGE_UP             = 11
+    PAGE_DOWN           = 12
+    END                 = 13
+    HOME                = 14
+    ARROW_LEFT          = 15
+    ARROW_UP            = 16
+    ARROW_RIGHT         = 17
+    ARROW_DOWN          = 18
+    PRINT               = 19
+    PRINT_SCREEN        = 20
+    INSERT              = 21 
+    DELETE              = 22  
+    _0                  = 23
+    _1                  = 24
+    _2                  = 25
+    _3                  = 26
+    _4                  = 27
+    _5                  = 28
+    _6                  = 29
+    _7                  = 30
+    _8                  = 31
+    _9                  = 32
+    A                   = 33
+    B                   = 34
+    C                   = 35
+    D                   = 36
+    E                   = 37
+    F                   = 38
+    G                   = 39
+    H                   = 40
+    I                   = 41
+    J                   = 42
+    K                   = 43
+    L                   = 44
+    M                   = 45
+    N                   = 46
+    O                   = 47
+    P                   = 48
+    Q                   = 49
+    R                   = 50
+    S                   = 51
+    T                   = 52
+    U                   = 53
+    V                   = 54
+    W                   = 55
+    X                   = 56
+    Y                   = 57 
+    Z                   = 58           
+    NUMPAD_0            = 59
+    NUMPAD_1            = 60
+    NUMPAD_2            = 61
+    NUMPAD_3            = 62
+    NUMPAD_4            = 63
+    NUMPAD_5            = 64
+    NUMPAD_6            = 65
+    NUMPAD_7            = 66
+    NUMPAD_8            = 67
+    NUMPAD_9            = 68
+    NUMPAD_MULTIPLY     = 69
+    NUMPAD_ADD          = 70
+    NUMPAD_SEPARATOR    = 71
+    NUMPAD_SUBTRACT     = 72
+    NUMPAD_DECIMAL      = 73
+    NUMPAD_DIVIDE       = 74
+    F1                  = 75
+    F2                  = 76
+    F3                  = 77
+    F4                  = 78
+    F5                  = 79
+    F6                  = 80
+    F7                  = 81
+    F8                  = 82
+    F9                  = 83
+    F10                 = 84
+    F11                 = 85
+    F12                 = 86
+    F13                 = 87
+    F14                 = 88
+    F15                 = 89
+    F16                 = 90
+    F17                 = 91
+    F18                 = 92
+    F19                 = 93
+    F20                 = 94
+    F21                 = 95
+    F22                 = 96
+    F23                 = 97
+    F24                 = 98
+    NUM_LOCK            = 99
+    SCROLL_LOCK         = 100
+    LSHIFT              = 101
+    RSHIFT              = 102
+    LCTRL               = 103
+    RCTRL               = 104
+    LALT                = 105
+    RALT                = 106
 
 def is_special_key(key):
     """
@@ -149,9 +149,8 @@ def is_special_key(key):
     """
     return key in [
         Key.ALT, Key.SHIFT, Key.CTRL, 
-        # Note: Left and right specific special keys are not supported.  Maybe in future.
-        #Key.LALT, Key.LSHIFT, Key.LCTRL, 
-        #Key.RALT, Key.RSHIFT, Key.RCTRL
+        Key.LALT, Key.LSHIFT, Key.LCTRL, 
+        Key.RALT, Key.RSHIFT, Key.RCTRL
     ]
 
 def key_to_vk_code(key):
@@ -160,6 +159,7 @@ def key_to_vk_code(key):
     return int      WinApi Virtual Key Code.
     """
     return {
+        Key.BREAK               : VK_CANCEL,  
         Key.BACKSPACE           : VK_BACK,             
         Key.TAB                 : VK_TAB,              
         Key.ENTER               : VK_RETURN,     
@@ -260,26 +260,25 @@ def key_to_vk_code(key):
         Key.F24                 : VK_F24,              
         Key.NUM_LOCK            : VK_NUMLOCK,          
         Key.SCROLL_LOCK         : VK_SCROLL,   
-        # Note: Left and right specific special keys are not supported. Maybe in future.
-        #Key.LSHIFT              : VK_LSHIFT,           
-        #Key.RSHIFT              : VK_RSHIFT,           
-        #Key.LCTRL               : VK_LCONTROL,         
-        #Key.RCTRL               : VK_RCONTROL,         
-        #Key.LALT                : VK_LMENU,            
-        #Key.RALT                : VK_RMENU,   
+        Key.LSHIFT              : VK_LSHIFT,           
+        Key.RSHIFT              : VK_RSHIFT,           
+        Key.LCTRL               : VK_LCONTROL,         
+        Key.RCTRL               : VK_RCONTROL,         
+        Key.LALT                : VK_LMENU,            
+        Key.RALT                : VK_RMENU,   
     }.get(key, None)  
 
-# Note: Left and right specific special keys are not supported.  Maybe in future.
-#def vk_code_to_sideless(vk_code):
-#    """
-#    key : Key
-#    return int      WinApi Virtual Key Code.
-#    """
-#    return {                      
-#        VK_LSHIFT   : VK_SHIFT,           
-#        VK_RSHIFT   : VK_SHIFT,           
-#        VK_LCONTROL : VK_CONTROL,         
-#        VK_RCONTROL : VK_CONTROL,         
-#        VK_LMENU    : VK_MENU,            
-#        VK_RMENU    : VK_MENU,   
-#    }.get(vk_code, vk_code)  
+
+def vk_code_to_sideless(vk_code):
+    """
+    key : Key
+    return int      WinApi Virtual Key Code.
+    """
+    return {                      
+        VK_LSHIFT   : VK_SHIFT,           
+        VK_RSHIFT   : VK_SHIFT,           
+        VK_LCONTROL : VK_CONTROL,         
+        VK_RCONTROL : VK_CONTROL,         
+        VK_LMENU    : VK_MENU,            
+        VK_RMENU    : VK_MENU,   
+    }.get(vk_code, vk_code)  

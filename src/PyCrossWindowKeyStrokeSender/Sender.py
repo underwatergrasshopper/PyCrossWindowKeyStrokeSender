@@ -287,24 +287,23 @@ def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
     else:
         raise UndefinedMessageEncodingFormatFail(encoding_type_id)
 
-    if is_special_key(key):
+    if key in [Key.ALT, Key.LALT, Key.RALT]:
+        # Note: Alt (especially right Alt) keystroke sends more than WM_KEYDOWN and WM_KEYUP message.
+        # Couldn't find clear specification which describes what is actually done.
+        # SendInput() function sends this keystroke correctly.
         raise MessageSupportFail(key.name + " (use Input() instead)")
 
     vk_code       = key_to_vk_code(key)
-
     scan_code     = MapVirtualKey(vk_code, MAPVK_VK_TO_VSC)
 
     l_param_down  = 0x00000001 | (scan_code  << 16)
     l_param_up    = 0xC0000001 | (scan_code  << 16)
 
-    # Note: Disabled delivering alt, ctrl and shift messages from here (left and right specific verions also). 
-    # Those keys do more than sending WM_KEYDOWN and WM_KEYUP messages with specific bitflags. 
-    # WM_SYSKEYDOWN and WM_SYSKEYUP are also sent in some of those cases.
-    #if key == Key.RIGHT_ALT or key == Key.RIGHT_CTRL:
-    #    l_param_down    |= 1 << 24
-    #    l_param_up      |= 1 << 24
-    #
-    #vk_code = vk_code_to_sideless(vk_code)
+    if is_ext_virtuel_key(vk_code):
+        l_param_down    |= 1 << 24
+        l_param_up      |= 1 << 24
+
+    vk_code = vk_code_to_sideless(vk_code)
 
     if delivery_type_id == DeliveryTypeID.SEND:
         if key_action & KeyAction.DOWN:
@@ -387,6 +386,35 @@ def make_text_input(text):
 
     return inputs
 
+
+def is_ext_virtuel_key(vk_code):
+    return vk_code in [
+        VK_INSERT,
+        VK_DELETE,
+
+        VK_HOME,
+        VK_END,
+        VK_PRIOR,
+        VK_NEXT,
+
+        VK_LEFT,
+        VK_UP,
+        VK_DOWN,
+        VK_RIGHT,
+
+        VK_RMENU,     
+        VK_RCONTROL,
+
+        VK_SNAPSHOT,
+        VK_SCROLL,
+        VK_CANCEL,
+
+        VK_NUMLOCK,
+        VK_DIVIDE,
+        # TODO: 'Numpad Enter' is also an extended key. Does he have virtual key code? Find it!
+    ]
+
+
 def make_key_input(key, key_action):
     """
     key         : Key
@@ -398,6 +426,8 @@ def make_key_input(key, key_action):
     vk_code       = key_to_vk_code(key)
     scan_code     = MapVirtualKeyW(vk_code, MAPVK_VK_TO_VSC)
 
+    ext_key_flag = KEYEVENTF_EXTENDEDKEY if is_ext_virtuel_key(vk_code) else 0
+
     if key_action & KeyAction.DOWN:
         input = INPUT()
 
@@ -405,7 +435,7 @@ def make_key_input(key, key_action):
         input.ki.wVk            = 0
         input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = KEYEVENTF_SCANCODE
+        input.ki.dwFlags        = KEYEVENTF_SCANCODE | ext_key_flag
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]
@@ -417,7 +447,7 @@ def make_key_input(key, key_action):
         input.ki.wVk            = 0
         input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP
+        input.ki.dwFlags        = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP | ext_key_flag
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]

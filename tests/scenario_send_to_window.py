@@ -61,22 +61,37 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Delay(0.01), cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
         #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
 
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.CTRL, cwkss.Key.SHIFT, cwkss.Wait(0.1))
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1))
+
+        # key - usupported keys fail - all this calls will fail
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.CTRL, cwkss.Key.ALT, cwkss.Key.SHIFT, cwkss.Wait(0.1))
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1))
+
         # input
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER))
         #cwkss.send_to_window("Path of Exile", cwkss.Input(cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER), cwkss.Wait(0.1))
 
-        # input - left|right alt shift ctrl - not supported
-        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1)) # will fail
-        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Input(cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT), cwkss.Wait(0.1))
-        
         # input - alt shift ctrl
-        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.CTRL, cwkss.Key.ALT, cwkss.Key.SHIFT, cwkss.Wait(0.1))
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Input(cwkss.Key.CTRL, cwkss.Key.ALT, cwkss.Key.SHIFT), cwkss.Wait(0.1))
+
+        # input - left|right alt shift ctrl
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Input(cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT), cwkss.Wait(0.1))
+
+        # input - other extended keys
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Delay(0.1), cwkss.Input(cwkss.Key.HOME))
 
         # input - capital a
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input((cwkss.Key.SHIFT, cwkss.KeyAction.DOWN), (cwkss.Key.A), (cwkss.Key.SHIFT, cwkss.KeyAction.UP)))
 
-        # input - ś by using GrAlt = Ctrl + Alt
+        # input - ś
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(
+        #    (cwkss.Key.RALT, cwkss.KeyAction.DOWN), 
+        #    (cwkss.Key.S), 
+        #    (cwkss.Key.RALT, cwkss.KeyAction.UP),
+        #))
+
+        # input - ś by using Ctrl + Alt
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(
         #    (cwkss.Key.CTRL, cwkss.KeyAction.DOWN), 
         #    (cwkss.Key.ALT, cwkss.KeyAction.DOWN), 

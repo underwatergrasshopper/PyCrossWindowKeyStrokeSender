@@ -52,6 +52,7 @@ WM_CHAR                 = 0x0102
 WM_KEYDOWN              = 0x0100
 WM_KEYUP                = 0x0101
 
+VK_CANCEL               = 0x03
 VK_BACK                 = 0x08   
 VK_TAB                  = 0x09
 VK_RETURN               = 0x0D  
