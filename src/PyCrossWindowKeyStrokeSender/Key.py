@@ -29,7 +29,7 @@ from enum import Enum
 __all__ = [
     "Key",
     "key_to_vk_code",
-    "vk_code_to_sideless",
+    # "vk_code_to_sideless", # Note: Left and right specific special keys are not supported.  Maybe in future.
     "is_special_key",
 ]
 
@@ -134,19 +134,25 @@ class Key(Enum):
     F24                 = 97
     NUM_LOCK            = 98
     SCROLL_LOCK         = 99
-    LSHIFT          = 100
-    RSHIFT         = 101
-    LCTRL           = 102
-    RCTRL          = 103
-    LALT            = 104
-    RALT           = 105
+    # Note: Left and right specific special keys are not supported.  Maybe in future.
+    #LSHIFT              = 100
+    #RSHIFT              = 101
+    #LCTRL               = 102
+    #RCTRL               = 103
+    #LALT                = 104
+    #RALT                = 105
 
 def is_special_key(key):
     """
     key : Key
     return bool
     """
-    return key in [Key.ALT, Key.SHIFT, Key.CTRL, Key.LALT, Key.LSHIFT, Key.LCTRL, Key.RALT, Key.RSHIFT, Key.RCTRL]
+    return key in [
+        Key.ALT, Key.SHIFT, Key.CTRL, 
+        # Note: Left and right specific special keys are not supported.  Maybe in future.
+        #Key.LALT, Key.LSHIFT, Key.LCTRL, 
+        #Key.RALT, Key.RSHIFT, Key.RCTRL
+    ]
 
 def key_to_vk_code(key):
     """
@@ -253,25 +259,27 @@ def key_to_vk_code(key):
         Key.F23                 : VK_F23,              
         Key.F24                 : VK_F24,              
         Key.NUM_LOCK            : VK_NUMLOCK,          
-        Key.SCROLL_LOCK         : VK_SCROLL,          
-        Key.LSHIFT              : VK_LSHIFT,           
-        Key.RSHIFT              : VK_RSHIFT,           
-        Key.LCTRL               : VK_LCONTROL,         
-        Key.RCTRL               : VK_RCONTROL,         
-        Key.LALT                : VK_LMENU,            
-        Key.RALT                : VK_RMENU,   
+        Key.SCROLL_LOCK         : VK_SCROLL,   
+        # Note: Left and right specific special keys are not supported. Maybe in future.
+        #Key.LSHIFT              : VK_LSHIFT,           
+        #Key.RSHIFT              : VK_RSHIFT,           
+        #Key.LCTRL               : VK_LCONTROL,         
+        #Key.RCTRL               : VK_RCONTROL,         
+        #Key.LALT                : VK_LMENU,            
+        #Key.RALT                : VK_RMENU,   
     }.get(key, None)  
 
-def vk_code_to_sideless(vk_code):
-    """
-    key : Key
-    return int      WinApi Virtual Key Code.
-    """
-    return {                      
-        VK_LSHIFT   : VK_SHIFT,           
-        VK_RSHIFT   : VK_SHIFT,           
-        VK_LCONTROL : VK_CONTROL,         
-        VK_RCONTROL : VK_CONTROL,         
-        VK_LMENU    : VK_MENU,            
-        VK_RMENU    : VK_MENU,   
-    }.get(vk_code, vk_code)  
+# Note: Left and right specific special keys are not supported.  Maybe in future.
+#def vk_code_to_sideless(vk_code):
+#    """
+#    key : Key
+#    return int      WinApi Virtual Key Code.
+#    """
+#    return {                      
+#        VK_LSHIFT   : VK_SHIFT,           
+#        VK_RSHIFT   : VK_SHIFT,           
+#        VK_LCONTROL : VK_CONTROL,         
+#        VK_RCONTROL : VK_CONTROL,         
+#        VK_LMENU    : VK_MENU,            
+#        VK_RMENU    : VK_MENU,   
+#    }.get(vk_code, vk_code)  
