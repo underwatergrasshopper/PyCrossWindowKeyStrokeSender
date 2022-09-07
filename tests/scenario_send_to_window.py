@@ -65,6 +65,26 @@ if __name__ == "__main__":
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER))
         #cwkss.send_to_window("Path of Exile", cwkss.Input(cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER), cwkss.Wait(0.1))
 
+        # input - left|right alt shift ctrl
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1)) # will fail
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Input(cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT), cwkss.Wait(0.1))
+        #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Input(cwkss.Key.CTRL, cwkss.Key.ALT, cwkss.Key.SHIFT), cwkss.Wait(0.1))
+
+        # input - capital a
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input((cwkss.Key.SHIFT, cwkss.KeyAction.DOWN), (cwkss.Key.A), (cwkss.Key.SHIFT, cwkss.KeyAction.UP)))
+
+        # input - ś by using GrAlt = Ctrl + Alt
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(
+        #    (cwkss.Key.CTRL, cwkss.KeyAction.DOWN), 
+        #    (cwkss.Key.ALT, cwkss.KeyAction.DOWN), 
+        #    (cwkss.Key.S), 
+        #    (cwkss.Key.ALT, cwkss.KeyAction.UP),
+        #    (cwkss.Key.CTRL, cwkss.KeyAction.UP)
+        #))
+
+        # input - double backspace
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(cwkss.Key.BACKSPACE, cwkss.Key.BACKSPACE))
+
         pass
     except cwkss.Fail as fail:
         print(fail)

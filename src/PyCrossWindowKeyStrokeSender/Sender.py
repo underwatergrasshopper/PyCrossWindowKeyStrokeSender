@@ -287,12 +287,24 @@ def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
     else:
         raise UndefinedMessageEncodingFormatFail(encoding_type_id)
 
+    if is_special_key(key):
+        raise MessageSupportFail(key.name + " (use Input() instead)")
+
     vk_code       = key_to_vk_code(key)
 
-    scan_code     = MapVirtualKey(vk_code, MAPVK_VK_TO_VSC);
+    scan_code     = MapVirtualKey(vk_code, MAPVK_VK_TO_VSC)
 
-    l_param_down  = 0x00000001 | (scan_code  << 16);
-    l_param_up    = 0xC0000001 | (scan_code  << 16);
+    l_param_down  = 0x00000001 | (scan_code  << 16)
+    l_param_up    = 0xC0000001 | (scan_code  << 16)
+
+    # Note: Disabled delivering alt, ctrl and shift messages from here (left and right specific verions also). 
+    # Those keys do more than sending WM_KEYDOWN and WM_KEYUP messages with specific bitflags. 
+    # WM_SYSKEYDOWN and WM_SYSKEYUP are also sent in some of those cases.
+    #if key == Key.RIGHT_ALT or key == Key.RIGHT_CTRL:
+    #    l_param_down    |= 1 << 24
+    #    l_param_up      |= 1 << 24
+    #
+    #vk_code = vk_code_to_sideless(vk_code)
 
     if delivery_type_id == DeliveryTypeID.SEND:
         if key_action & KeyAction.DOWN:
@@ -383,14 +395,17 @@ def make_key_input(key, key_action):
     """
     inputs = [] # INPUT
 
+    vk_code       = key_to_vk_code(key)
+    scan_code     = MapVirtualKeyW(vk_code, MAPVK_VK_TO_VSC)
+
     if key_action & KeyAction.DOWN:
         input = INPUT()
 
         input.type              = INPUT_KEYBOARD
-        input.ki.wVk            = VK_RETURN
-        input.ki.wScan          = 0
+        input.ki.wVk            = 0
+        input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = 0
+        input.ki.dwFlags        = KEYEVENTF_SCANCODE
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]
@@ -399,10 +414,10 @@ def make_key_input(key, key_action):
         input = INPUT()
 
         input.type              = INPUT_KEYBOARD
-        input.ki.wVk            = VK_RETURN
-        input.ki.wScan          = 0
+        input.ki.wVk            = 0
+        input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = KEYEVENTF_KEYUP
+        input.ki.dwFlags        = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]

@@ -25,11 +25,12 @@ from ._Private.Types    import *
 from .Commons           import *
 from .Key               import *
 
+from .Key               import __all__ as key__all__
+
 from enum import Enum
 
 __all__ = [
-    "Key",
-    "key_to_vk_code",
+    *key__all__,
     "KeyAction",
     "Input",
     "DeliveryTypeID",

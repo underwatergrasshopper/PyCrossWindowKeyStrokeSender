@@ -42,6 +42,7 @@ __all__ = [
     "UndefinedActionFail",
     "UndefinedMessageDeliveryModeFail",
     "UndefinedMessageEncodingFormatFail",
+    "MessageSupportFail",
 ]
 
 class Fail(Exception):
@@ -162,5 +163,13 @@ class UndefinedMessageEncodingFormatFail(SendToWindowFail):
         is_last_error       : bool
         """
         super().__init__("Can not process undefined message encoding type %s." % encoding_type_id.name, is_last_error)
+
+class MessageSupportFail(SendToWindowFail):
+    def __init__(self, message, is_last_error = False):
+        """
+        message             : str
+        is_last_error       : bool
+        """
+        super().__init__("Unsupported message: %s." % message, is_last_error)
 
         

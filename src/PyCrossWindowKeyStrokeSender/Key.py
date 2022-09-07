@@ -29,6 +29,8 @@ from enum import Enum
 __all__ = [
     "Key",
     "key_to_vk_code",
+    "vk_code_to_sideless",
+    "is_special_key",
 ]
 
 class Key(Enum):
@@ -36,7 +38,7 @@ class Key(Enum):
     TAB                 = 1
     ENTER               = 2 
     SHIFT               = 3 
-    CONTROL             = 4 
+    CTRL                = 4 
     ALT                 = 5 
     PAUSE               = 6
     CAPS_LOCK           = 7
@@ -132,13 +134,19 @@ class Key(Enum):
     F24                 = 97
     NUM_LOCK            = 98
     SCROLL_LOCK         = 99
-    # TODO: Implement.
-    # LEFT_SHIFT          = 100
-    # RIGHT_SHIFT         = 101
-    # LEFT_CONTROL        = 102
-    # RIGHT_CONTROL       = 103
-    # LEFT_ALT            = 104
-    # RIGHT_ALT           = 105
+    LSHIFT          = 100
+    RSHIFT         = 101
+    LCTRL           = 102
+    RCTRL          = 103
+    LALT            = 104
+    RALT           = 105
+
+def is_special_key(key):
+    """
+    key : Key
+    return bool
+    """
+    return key in [Key.ALT, Key.SHIFT, Key.CTRL, Key.LALT, Key.LSHIFT, Key.LCTRL, Key.RALT, Key.RSHIFT, Key.RCTRL]
 
 def key_to_vk_code(key):
     """
@@ -150,7 +158,7 @@ def key_to_vk_code(key):
         Key.TAB                 : VK_TAB,              
         Key.ENTER               : VK_RETURN,     
         Key.SHIFT               : VK_SHIFT,            
-        Key.CONTROL             : VK_CONTROL,          
+        Key.CTRL                : VK_CONTROL,          
         Key.ALT                 : VK_MENU,                
         Key.PAUSE               : VK_PAUSE,            
         Key.CAPS_LOCK           : VK_CAPITAL,          
@@ -246,11 +254,24 @@ def key_to_vk_code(key):
         Key.F24                 : VK_F24,              
         Key.NUM_LOCK            : VK_NUMLOCK,          
         Key.SCROLL_LOCK         : VK_SCROLL,          
-        # TODO: Implement. LEFT... = ..., RIGHT -> (l_param &= (1 << 24))
-        # Key.LEFT_SHIFT          : VK_LSHIFT,           
-        # Key.RIGHT_SHIFT         : VK_RSHIFT,           
-        # Key.LEFT_CONTROL        : VK_LCONTROL,         
-        # Key.RIGHT_CONTROL       : VK_RCONTROL,         
-        # Key.LEFT_ALT            : VK_LMENU,            
-        # Key.RIGHT_ALT           : VK_RMENU,   
+        Key.LSHIFT              : VK_LSHIFT,           
+        Key.RSHIFT              : VK_RSHIFT,           
+        Key.LCTRL               : VK_LCONTROL,         
+        Key.RCTRL               : VK_RCONTROL,         
+        Key.LALT                : VK_LMENU,            
+        Key.RALT                : VK_RMENU,   
     }.get(key, None)  
+
+def vk_code_to_sideless(vk_code):
+    """
+    key : Key
+    return int      WinApi Virtual Key Code.
+    """
+    return {                      
+        VK_LSHIFT   : VK_SHIFT,           
+        VK_RSHIFT   : VK_SHIFT,           
+        VK_LCONTROL : VK_CONTROL,         
+        VK_RCONTROL : VK_CONTROL,         
+        VK_LMENU    : VK_MENU,            
+        VK_RMENU    : VK_MENU,   
+    }.get(vk_code, vk_code)  
