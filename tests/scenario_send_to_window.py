@@ -24,7 +24,7 @@
 
 import PyCrossWindowKeyStrokeSender as cwkss
 
-cwkss.Commons.is_debug = True
+cwkss.enable_debug()
 
 if __name__ == "__main__":
     try:
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.ASCII, cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.UTF16, cwkss.POST, cwkss.Delay(0.1), "Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER)
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.POST, cwkss.Delay(0.1), "Some text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP), "Another text.", (cwkss.Key.ENTER, cwkss.KeyAction.DOWN), (cwkss.Key.ENTER, cwkss.KeyAction.UP))
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.POST, cwkss.Delay(0.1), "Some text.", (cwkss.Key.ENTER, cwkss.KeyState.DOWN), (cwkss.Key.ENTER, cwkss.KeyState.UP), "Another text.", (cwkss.Key.ENTER, cwkss.KeyState.DOWN), (cwkss.Key.ENTER, cwkss.KeyState.UP))
         #cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
         #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Delay(0.01), cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER)
         #cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
@@ -82,22 +82,22 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Delay(0.1), cwkss.Input(cwkss.Key.HOME))
 
         # input - capital a
-        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input((cwkss.Key.SHIFT, cwkss.KeyAction.DOWN), (cwkss.Key.A), (cwkss.Key.SHIFT, cwkss.KeyAction.UP)))
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input((cwkss.Key.SHIFT, cwkss.KeyState.DOWN), (cwkss.Key.A), (cwkss.Key.SHIFT, cwkss.KeyState.UP)))
 
         # input - ś
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(
-        #    (cwkss.Key.RALT, cwkss.KeyAction.DOWN), 
+        #    (cwkss.Key.RALT, cwkss.KeyState.DOWN), 
         #    (cwkss.Key.S), 
-        #    (cwkss.Key.RALT, cwkss.KeyAction.UP),
+        #    (cwkss.Key.RALT, cwkss.KeyState.UP),
         #))
 
         # input - ś by using Ctrl + Alt
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(
-        #    (cwkss.Key.CTRL, cwkss.KeyAction.DOWN), 
-        #    (cwkss.Key.ALT, cwkss.KeyAction.DOWN), 
+        #    (cwkss.Key.CTRL, cwkss.KeyState.DOWN), 
+        #    (cwkss.Key.ALT, cwkss.KeyState.DOWN), 
         #    (cwkss.Key.S), 
-        #    (cwkss.Key.ALT, cwkss.KeyAction.UP),
-        #    (cwkss.Key.CTRL, cwkss.KeyAction.UP)
+        #    (cwkss.Key.ALT, cwkss.KeyState.UP),
+        #    (cwkss.Key.CTRL, cwkss.KeyState.UP)
         #))
 
         # input - double backspace

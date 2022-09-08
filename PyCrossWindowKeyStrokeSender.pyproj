@@ -34,9 +34,11 @@
     <Compile Include="setup.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Actions.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Commons.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\Debug.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Exceptions.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Key.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\Sender.py" />
+    <Compile Include="src\PyCrossWindowKeyStrokeSender\_Private\ActionsSupport.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\_Private\Types.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\_Private\__init__.py" />
     <Compile Include="src\PyCrossWindowKeyStrokeSender\__init__.py" />

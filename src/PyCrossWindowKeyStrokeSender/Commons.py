@@ -21,23 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
-import inspect
 
 __all__ = [
     "to_utf16",
     "to_bytes",
-    "debug_print",
 ]
-
-is_debug = False
-
-def debug_print(*params):
-    """
-    params : arg, ...       Same arguments as for print function.
-    """
-    if is_debug:
-        caller_function_name = inspect.currentframe().f_back.f_code.co_name
-        print("[" + caller_function_name + "]", *params)
 
 def to_utf16(text):
     """

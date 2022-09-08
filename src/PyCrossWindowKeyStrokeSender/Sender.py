@@ -21,13 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
-from ._Private.Types    import *
-from .Commons           import *
-from .Exceptions        import *
-from .Actions           import *
+from ._Private.Types            import *
+from ._Private.ActionsSupport   import *
+from .Debug                     import *
+from .Commons                   import *
+from .Exceptions                import *
+from .Actions                   import *
 
 import time
-from enum               import Enum
+from enum                       import Enum
 
 __all__ = [
     "send_to_window",
@@ -166,7 +168,7 @@ def try_set_foreground_window(window, max_num_of_tries = 10, interval = 0.01):
     debug_print("max_num_of_tries left: ", num_of_tries_left)
     return False
 
-def is_key_and_key_action_tuple(action):
+def is_key_and_key_state_tuple(action):
     return isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int)
 
 def deliver_messages(focus_window, actions):
@@ -189,11 +191,11 @@ def deliver_messages(focus_window, actions):
 
         elif isinstance(action, Key): # key
             debug_print("deliver key message: ", action.name)
-            deliver_key(focus_window, action, KeyAction.DOWN_AND_UP, encoding_type_id, delivery_type_id)
+            deliver_key(focus_window, action, KeyState.DOWN_AND_UP, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
              
-        elif is_key_and_key_action_tuple(action): # key
+        elif is_key_and_key_state_tuple(action): # key
             debug_print("deliver key message: ", action[0].name)
             deliver_key(focus_window, action[0], action[1], encoding_type_id, delivery_type_id)
 
@@ -265,11 +267,11 @@ def deliver_text(window, text, encoding_type_id, delivery_type_id):
     else:
         raise UndefinedMessageEncodingFormatFail(encoding_type_id)
 
-def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
+def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
     """
     window              : HWND
     key                 : Key
-    key_action          : int               Bifield made from KeyAction bit sets.
+    key_state           : int               Bifield made from KeyState bit sets.
     encoding_type_id    : EncodingTypeID
     delivery_type_id    : DeliveryTypeID
     """
@@ -306,21 +308,21 @@ def deliver_key(window, key, key_action, encoding_type_id, delivery_type_id):
     vk_code = vk_code_to_sideless(vk_code)
 
     if delivery_type_id == DeliveryTypeID.SEND:
-        if key_action & KeyAction.DOWN:
+        if key_state & KeyState.DOWN:
             debug_print("DOWN")
             SendMessage(window, WM_KEYDOWN, vk_code, l_param_down)
 
-        if key_action & KeyAction.UP:
+        if key_state & KeyState.UP:
             debug_print("UP")
             SendMessage(window, WM_KEYUP, vk_code, l_param_up)
 
     elif delivery_type_id == DeliveryTypeID.POST:
-        if key_action & KeyAction.DOWN:
+        if key_state & KeyState.DOWN:
             debug_print("DOWN")
             if not PostMessage(window, WM_KEYDOWN, vk_code, l_param_down):
                 raise DelivarMessageFail("%s DOWN" % key_to_vk_code(key))
 
-        if key_action & KeyAction.UP:
+        if key_state & KeyState.UP:
             debug_print("UP")
             if not PostMessage(window, WM_KEYUP, vk_code, l_param_up):
                 raise DelivarMessageFail("%s UP" % key_to_vk_code(key))
@@ -338,8 +340,8 @@ def deliver_input(window, actions):
         if isinstance(action, (bytes, str)): # text
             inputs += make_text_input(action)
         elif isinstance(action, Key): # key
-            inputs += make_key_input(action, KeyAction.DOWN_AND_UP)
-        elif is_key_and_key_action_tuple(action): # key
+            inputs += make_key_input(action, KeyState.DOWN_AND_UP)
+        elif is_key_and_key_state_tuple(action): # key
             inputs += make_key_input(action[0], action[1])
         else:
             raise UndefinedActionFail(type(action).__name__)
@@ -415,10 +417,10 @@ def is_ext_virtuel_key(vk_code):
     ]
 
 
-def make_key_input(key, key_action):
+def make_key_input(key, key_state):
     """
     key         : Key
-    key_action  : KeyAction
+    key_state   : KeyState
     return list(INPUT)
     """
     inputs = [] # INPUT
@@ -428,7 +430,7 @@ def make_key_input(key, key_action):
 
     ext_key_flag = KEYEVENTF_EXTENDEDKEY if is_ext_virtuel_key(vk_code) else 0
 
-    if key_action & KeyAction.DOWN:
+    if key_state & KeyState.DOWN:
         input = INPUT()
 
         input.type              = INPUT_KEYBOARD
@@ -440,7 +442,7 @@ def make_key_input(key, key_action):
 
         inputs += [input]
 
-    if key_action & KeyAction.UP:
+    if key_state & KeyState.UP:
         input = INPUT()
 
         input.type              = INPUT_KEYBOARD
