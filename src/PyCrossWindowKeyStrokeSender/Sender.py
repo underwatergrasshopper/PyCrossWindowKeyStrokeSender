@@ -83,38 +83,38 @@ def send_to_window_by_handle(target_window, actions):
     debug_print("foreground_window handle: ", foreground_window)
 
     if not foreground_window:
-        raise FindForegroundWindowFail(True)
+        raise SetupFail("Can not find foreground window.", True)
 
     target_window_thread_id = GetWindowThreadProcessId(target_window, NULL);
 
     debug_print("target_window_thread_id handle: ", target_window_thread_id)
 
     if not target_window_thread_id:
-       return ReceiveTargetWindowThreadIdFail()
+       return SetupFail("Can not receive target window thread id.")
 
     caller_window_thread_id = GetCurrentThreadId()
 
     debug_print("caller_window_thread_id handle: ", caller_window_thread_id)
 
     if not caller_window_thread_id:
-       return ReceiveCallerWindowThreadIdFail()
+       return SetupFail("Can not receive caller window thread id.")
 
     if target_window_thread_id and (target_window_thread_id is not caller_window_thread_id):
         is_success = AttachThreadInput(caller_window_thread_id, target_window_thread_id, TRUE)
         
         if not is_success:
-            return AttachCallerToTargetFail(True)
+            return SetupFail("Can not attach caller window thread to target window thread.", True)
 
         try:
             focus_and_send_messages(target_window, foreground_window, actions)
-        except SendToWindowFail:
+        except Exception:
             AttachThreadInput(caller_window_thread_id, target_window_thread_id, FALSE)
             raise
 
         is_success = AttachThreadInput(caller_window_thread_id, target_window_thread_id, FALSE)
 
         if not is_success:
-            return DetachCallerFromTargetFail(True)
+            return CleanupFail("Can not detach caller window thread from target window thread.", True)
     else:
         # When the target window is the caller window.
 
@@ -132,25 +132,25 @@ def focus_and_send_messages(target_window, foreground_window, actions):
     is_success = SetForegroundWindow(target_window)
     
     if not is_success:
-        raise SetTargetWindowAsForegroundFail(True)
+        raise SetupFail("Can not set target window to be foreground window.", True)
 
     focus_window = GetFocus()
     
     debug_print("focus_window: ", focus_window)
     
     if not focus_window: 
-        GetWindowWithKeyboardFocusFail(True)
+        SetupFail("Can not get window with keyboard focus.", True)
 
     try:
         deliver_messages(focus_window, actions)
-    except SendToWindowFail:
+    except Exception:
         try_set_foreground_window(foreground_window)
         raise
 
     is_success = try_set_foreground_window(foreground_window)
 
     if not is_success:
-        raise SetCallerWindowToForegroundFail(True)
+        raise SetupFail("Can not set previous foreground window back to be foreground window.", True)
     
     SetFocus(foreground_window)
 
@@ -187,25 +187,25 @@ def deliver_messages(focus_window, actions):
     delay                   = 0.0           # in seconds
 
     for action in actions:
-        if isinstance(action, (bytes, str)): # text
+        if isinstance(action, (bytes, str)):        # text
             debug_print("deliver text message")
             deliver_text(focus_window, action, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
 
-        elif isinstance(action, Key): # key
+        elif isinstance(action, Key):               # key
             debug_print("deliver key message: ", action.name)
             deliver_key(focus_window, action, KeyState.DOWN_AND_UP, encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
              
-        elif is_key_and_key_state_tuple(action): # key
+        elif is_key_and_key_state_tuple(action):    # (key, state)
             debug_print("deliver key message: ", action[0].name)
             deliver_key(focus_window, action[0], action[1], encoding_type_id, delivery_type_id)
 
             time.sleep(delay)
 
-        elif isinstance(action, Input): # input
+        elif isinstance(action, Input):             # input
             debug_print("deliver input message: ", action.actions)
             deliver_input(focus_window, action.actions)
 
@@ -229,7 +229,7 @@ def deliver_messages(focus_window, actions):
             delay = action.delay_time
 
         else:
-            raise UndefinedActionFail(type(action).__name__)
+            raise ArgumentFail("Can not process unexpected action type: %s." % type(action).__name__)
 
 
 def deliver_text(window, text, encoding_type_id, delivery_type_id):
@@ -252,9 +252,10 @@ def deliver_text(window, text, encoding_type_id, delivery_type_id):
         elif delivery_type_id == DeliveryTypeID.POST:
             for sign in text:
                 if not PostMessageA(window, WM_CHAR, sign, 0):
-                    raise DelivarMessageFail("\"%s\"" % to_utf16(text))
+                    raise DeliverMessageFail("Can not deliver ascii message: \"%s\"" % to_utf16(text))
         else:
-            raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+            raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
+
     elif encoding_type_id == EncodingTypeID.UTF16:
         text = to_utf16(text)
 
@@ -265,17 +266,17 @@ def deliver_text(window, text, encoding_type_id, delivery_type_id):
         elif delivery_type_id == DeliveryTypeID.POST:
             for sign in text:
                 if not PostMessageW(window, WM_CHAR, ord(sign), 0):
-                    raise DelivarMessageFail("\"%s\"" % text)
+                    raise DeliverMessageFail("Can not deliver utf-16 message: \"%s\"" % to_utf16(text))
         else:
-            raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+            raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
     else:
-        raise UndefinedMessageEncodingFormatFail(encoding_type_id)
+        raise DeliverMessageFail("Can not process unsupported encoding format: \"%s\"." % encoding_type_id.name)
 
 def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
     """
     window              : HWND
     key                 : Key
-    key_state           : int               Bifield made from KeyState bit sets.
+    key_state           : int               Bitfield made from KeyState bit sets.
     encoding_type_id    : EncodingTypeID
     delivery_type_id    : DeliveryTypeID
     """
@@ -291,13 +292,13 @@ def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
         PostMessage     = PostMessageW
         MapVirtualKey   = MapVirtualKeyW
     else:
-        raise UndefinedMessageEncodingFormatFail(encoding_type_id)
+        raise DeliverMessageFail("Can not process unsupported encoding format: \"%s\"." % encoding_type_id.name)
 
     if key in [Key.ALT, Key.LALT, Key.RALT]:
         # Note: Alt (especially right Alt) keystroke sends more than WM_KEYDOWN and WM_KEYUP message.
         # Couldn't find clear specification which describes what is actually done.
         # SendInput() function sends this keystroke correctly.
-        raise MessageSupportFail(key.name + " (use Input() instead)")
+        raise DeliverMessageFail("Can not deliver message with unsupported key: %s. (use Input() instead)" % key.name)
 
     vk_code       = key_to_vk_code(key)
     scan_code     = MapVirtualKey(vk_code, MAPVK_VK_TO_VSC)
@@ -324,14 +325,14 @@ def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
         if key_state & KeyState.DOWN:
             debug_print("DOWN")
             if not PostMessage(window, WM_KEYDOWN, vk_code, l_param_down):
-                raise DelivarMessageFail("%s DOWN" % key_to_vk_code(key))
+                raise DeliverMessageFail("Can not post message: %s DOWN." % key_to_vk_code(key))
 
         if key_state & KeyState.UP:
             debug_print("UP")
             if not PostMessage(window, WM_KEYUP, vk_code, l_param_up):
-                raise DelivarMessageFail("%s UP" % key_to_vk_code(key))
+                raise DeliverMessageFail("Can not post message: %s UP." % key_to_vk_code(key))
     else:
-        raise UndefinedMessageDeliveryModeFail(delivery_type_id)
+        raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
 
 def deliver_input(window, actions):
     """
@@ -348,14 +349,14 @@ def deliver_input(window, actions):
         elif is_key_and_key_state_tuple(action): # key
             inputs += make_key_input(action[0], action[1])
         else:
-            raise UndefinedActionFail(type(action).__name__)
+            raise DeliverMessageFail("Can not process unexpected (for Input) action type: %s." % type(action).__name__)
 
     length = len(inputs)
     raw_inputs = (INPUT * length)(*inputs)  # ctypes requires specific type for array
 
     count = SendInput(length, raw_inputs, sizeof(INPUT))
     if count != length:
-        raise DelivarMessageFail(str(actions) + " input")
+        raise DeliverMessageFail("Can not deliver all messages (for Input): %s. Delivered %d messages. " % (str(actions), count))
 
 
 def make_text_input(text):

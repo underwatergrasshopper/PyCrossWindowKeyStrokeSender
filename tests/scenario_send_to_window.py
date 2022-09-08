@@ -64,7 +64,7 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.CTRL, cwkss.Key.SHIFT, cwkss.Wait(0.1))
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1))
 
-        # key - usupported keys fail - all this calls will fail
+        # key - unsupported keys fail - all this calls will fail
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.CTRL, cwkss.Key.ALT, cwkss.Key.SHIFT, cwkss.Wait(0.1))
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1))
 

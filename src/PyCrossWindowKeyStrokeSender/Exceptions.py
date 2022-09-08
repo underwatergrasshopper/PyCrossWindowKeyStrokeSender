@@ -28,148 +28,71 @@ from enum               import Enum
 
 __all__ = [
     "Fail",
-    "SendToWindowFail",
-    "DelivarMessageFail",
+
+    "ArgumentFail",
+    "SetupFail",
+    "DeliverMessageFail",
+    "CleanupFail",
+
     "FindTargetWindowFail",
-    "FindForegroundWindowFail",
-    "ReceiveTargetWindowThreadIdFail",
-    "ReceiveCallerWindowThreadIdFail",
-    "AttachCallerToTargetFail",
-    "SetTargetWindowAsForegroundFail",
-    "GetWindowWithKeyboardFocusFail",
-    "SetCallerWindowToForegroundFail",
-    "DetachCallerFromTargetFail",
-    "UndefinedActionFail",
-    "UndefinedMessageDeliveryModeFail",
-    "UndefinedMessageEncodingFormatFail",
-    "MessageSupportFail",
 ]
 
 class Fail(Exception):
-    error_code = 0          # int
+    error_code  = 0          # int
 
-    def __init__(self, message, is_last_error = False):
+    def __init__(self, message, is_winapi_last_error = False):
         """
         message         : str
         is_last_error   : bool
         """
         full_message = "CWKSS Error: %s" % message
-        if is_last_error:
+        if is_winapi_last_error:
             self.error_code = GetLastError()
             full_message += " (windows error code: %d)" % self.error_code
         super().__init__(full_message)
 
-### SendToWindow Fails ###
+### General Fails ###
 
-class SendToWindowFail(Fail):
-    def __init__(self, message, is_last_error = False):
+class ArgumentFail(Fail):
+    def __init__(self, message, is_winapi_last_error = False):
         """
         message         : str
         is_last_error   : bool
         """
-        super().__init__(message, is_last_error)
+        super().__init__(message, is_winapi_last_error)
 
-class DelivarMessageFail(SendToWindowFail):
-    def __init__(self, message, is_last_error = False):
+class SetupFail(Fail):
+    def __init__(self, message, is_winapi_last_error = False):
         """
         message         : str
         is_last_error   : bool
         """
-        super().__init__("Can not deliver %s message." % message, is_last_error)
+        super().__init__(message, is_winapi_last_error)
 
-class FindTargetWindowFail(SendToWindowFail):
+class DeliverMessageFail(Fail):
+    def __init__(self, message, is_winapi_last_error = False):
+        """
+        message         : str
+        is_last_error   : bool
+        """
+        super().__init__(message, is_winapi_last_error)
+
+class CleanupFail(Fail):
+    def __init__(self, message, is_winapi_last_error = False):
+        """
+        message         : str
+        is_last_error   : bool
+        """
+        super().__init__(message, is_winapi_last_error)
+
+### Specific Fails ###
+
+class FindTargetWindowFail(Fail):
     def __init__(self, window_name, is_last_error = False):
         """
         is_last_error   : bool
         """
         super().__init__("Can not find target window with name \"%s\"." % window_name, is_last_error)
 
-class FindForegroundWindowFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not find foreground window.", is_last_error)
-
-class ReceiveTargetWindowThreadIdFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not receive target window thread id.", is_last_error)
-
-class ReceiveCallerWindowThreadIdFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not receive caller window thread id.", is_last_error)
-
-class AttachCallerToTargetFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not attach caller window thread to target window thread.", is_last_error)
-
-class SetTargetWindowAsForegroundFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not set target window as foreground window.", is_last_error)
-
-class GetWindowWithKeyboardFocusFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not get handle of window with keyboard focus.", is_last_error)
-
-class SetCallerWindowToForegroundFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not set caller window to be foreground window.", is_last_error)
-
-class DetachCallerFromTargetFail(SendToWindowFail):
-    def __init__(self, is_last_error = False):
-        """
-        is_last_error   : bool
-        """
-        super().__init__("Can not detach caller window thread from target window thread.", is_last_error)
-
-class UndefinedActionFail(SendToWindowFail):
-    def __init__(self, undefined_action_name, is_last_error = False):
-        """
-        undefined_action_name   : str
-        is_last_error           : bool
-        """
-        super().__init__("Can not process undefined action for \"%s\" argument type." % undefined_action_name, is_last_error)
-
-class UndefinedMessageDeliveryModeFail(SendToWindowFail):
-    def __init__(self, delivery_type_id, is_last_error = False):
-        """
-        delivery_type_id    : DelivaryTypeID
-        is_last_error       : bool
-        """
-        super().__init__("Can not process undefined message delivery type %s." % delivery_type_id.name, is_last_error)
-
-class UndefinedMessageEncodingFormatFail(SendToWindowFail):
-    def __init__(self, encoding_type_id, is_last_error = False):
-        """
-        encoding_type_id    : EncodingTypeID
-        is_last_error       : bool
-        """
-        super().__init__("Can not process undefined message encoding type %s." % encoding_type_id.name, is_last_error)
-
-class MessageSupportFail(SendToWindowFail):
-    def __init__(self, message, is_last_error = False):
-        """
-        message             : str
-        is_last_error       : bool
-        """
-        super().__init__("Unsupported message: %s." % message, is_last_error)
 
         
