@@ -169,6 +169,10 @@ def try_set_foreground_window(window, max_num_of_tries = 10, interval = 0.01):
     return False
 
 def is_key_and_key_state_tuple(action):
+    """
+    action : <Action>
+    return bool
+    """
     return isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int)
 
 def deliver_messages(focus_window, actions):
@@ -387,35 +391,6 @@ def make_text_input(text):
         inputs += [input]
 
     return inputs
-
-
-def is_ext_virtuel_key(vk_code):
-    return vk_code in [
-        VK_INSERT,
-        VK_DELETE,
-
-        VK_HOME,
-        VK_END,
-        VK_PRIOR,
-        VK_NEXT,
-
-        VK_LEFT,
-        VK_UP,
-        VK_DOWN,
-        VK_RIGHT,
-
-        VK_RMENU,     
-        VK_RCONTROL,
-
-        VK_SNAPSHOT,
-        VK_SCROLL,
-        VK_CANCEL,
-
-        VK_NUMLOCK,
-        VK_DIVIDE,
-        # TODO: 'Numpad Enter' is also an extended key. Does he have virtual key code? Find it!
-    ]
-
 
 def make_key_input(key, key_state):
     """

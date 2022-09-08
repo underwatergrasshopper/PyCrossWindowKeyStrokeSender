@@ -26,17 +26,6 @@ from ..Actions  import *
 
 from enum import Enum
 
-def is_special_key(key):
-    """
-    key : Key
-    return bool
-    """
-    return key in [
-        Key.ALT, Key.SHIFT, Key.CTRL, 
-        Key.LALT, Key.LSHIFT, Key.LCTRL, 
-        Key.RALT, Key.RSHIFT, Key.RCTRL
-    ]
-
 def key_to_vk_code(key):
     """
     key : Key
@@ -151,6 +140,45 @@ def key_to_vk_code(key):
         Key.LALT                : VK_LMENU,            
         Key.RALT                : VK_RMENU,   
     }.get(key, None)  
+
+
+def is_ext_virtuel_key(vk_code):
+    return vk_code in [
+        VK_INSERT,
+        VK_DELETE,
+
+        VK_HOME,
+        VK_END,
+        VK_PRIOR,
+        VK_NEXT,
+
+        VK_LEFT,
+        VK_UP,
+        VK_DOWN,
+        VK_RIGHT,
+
+        VK_RMENU,     
+        VK_RCONTROL,
+
+        VK_SNAPSHOT,
+        VK_SCROLL,
+        VK_CANCEL,
+
+        VK_NUMLOCK,
+        VK_DIVIDE,
+        # TODO: 'Numpad Enter' is also an extended key. Does he have virtual key code? Find it!
+    ]
+
+def is_special_key(key):
+    """
+    key : Key
+    return bool
+    """
+    return key in [
+        Key.ALT, Key.SHIFT, Key.CTRL, 
+        Key.LALT, Key.LSHIFT, Key.LCTRL, 
+        Key.RALT, Key.RSHIFT, Key.RCTRL
+    ]
 
 def vk_code_to_sideless(vk_code):
     """
