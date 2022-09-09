@@ -37,16 +37,77 @@ __all__ = [
 
 def send_to_window(target_window_name, *actions):
     """
-    Sends keyboard messages to target window.
-    target_window_name  : bytes or str      Name of window to which messages will be sent. 
-    actions             : <Action>, ...     Actions, which are containing messages to send and informations how to send messages. Each action is defined by it's type:
-                                                bytes   - Text message in ASCII encoding format.
-                                                          Note: Uses internally WinApi functions with suffix A. 
-                                                str     - Text message in UTF-16 encoding format.
-                                                          Note: Uses internally WinApi functions with suffix W. 
-                                            Note: Input text is utf-16 only? and key messages also?
-                                                
-    raise                                   Any Exception which inherits from SendToWindowFail. For more details check Exceptions submodule module.
+    Delivers keyboard key and text messages to the target window.
+
+    target_window name : bytes or str       Name of the window to which messages will be sent.
+    actions : <Action>, ...                 Actions to be performed in the same order as they are in arguments.
+                                            Allowed <Action> types:
+                                            
+
+                                            SEND                            (Default) Changes message delivery method to send. 
+                                                                            Function will wait after sending each message until it's delivered. 
+                                                                            Might be slow, but it's gives most chance, for massages, to be delivered in order. 
+                                                                            Example: send_to_window("Some Window", "Some text.", Key.ENTER, Wait(0.1))
+                                                                            Example: send_to_window("Some Window", SEND, "Some text.", Key.ENTER, Wait(0.1))
+                                                                
+                                                                
+                                            POST                            Changes message delivery method to post. Function will NOT wait after sending each message until it's delivered. 
+                                                                            In many cases, much more faster than SEND method, but requires setting small delay for messages to help deliver messages in order.
+                                                                            Example: send_to_window("Some Window", POST, Delay(0.1), "Some text.", Key.ENTER, Wait(0.1))
+                                                                
+                                                                            Delivery methods can be changed multiple times between messages.
+                                                                            send_to_window("Some Window", Delay(0.1), SEND, "Some text.", "Some other text", POST, u"Some another text", Wait(0.1)) 
+                                                                
+                                                                
+                                            UTF16                           Messages will be delivered as utf-16 messages. 
+                                                                            Use this action, if text messages have any unicode character in any encoding format (utf-8, utf-16, utf-32).
+                                                                            Example: send_to_window("Some Window", UTF16, u"Some text. \u0444", Wait(0.1))
+                                                                
+                                                                            Note: Uses internally winapi functions with W suffix.
+                                                                
+                                                                
+                                            ASCII                           (Default) Messages will be delivered as ascii messages. 
+                                                                            Use this action if text message have only ascii characters.
+                                                                            Example: send_to_window("Some Window", "Some text.", Wait(0.1)) 
+                                                                            Example: send_to_window("Some Window", ASCII, "Some text.", Wait(0.1)) 
+                                                                
+                                                                            Note: Uses internally winapi functions with A suffix.
+                                                                
+                                                                            Encoding format of delivery can be changed multiple times between messages.
+                                                                            send_to_window("Some Window", ASCII, "Some ascii text.", "Some other ascii text", UTF16, u"Some unicode text \u0444", Wait(0.1)) 
+                                                                
+                                                                
+                                            bytes or str                    Text message.
+                                                                
+                                                                
+                                            Key                             Key message. Both key down and key up message. First down and then up will be delivered.
+                                                                            Example: send_to_window("Some Window", Key.ENTER, Wait(0.1))
+                                                                
+                                                                
+                                            tuple(Key, KeyState)            Key message with specified what key action is performed. Either down or up.
+                                                                            Example: send_to_window("Some Window", (Key.ENTER, KeyState.DOWN), (Key.ENTER, KeyState.UP), Wait(0.1))
+                                                                
+                                            Input(<SimpleMessage>, ...)     Input delivery method with messages. Delivers contained messages by simulating keyboard actions. 
+                                                                            If simulating exact keyboard actions is needed, then this method have most chance of success. 
+                                                                            Doesn't wait until messages are delivered, so small wait is required to help deliver messages. 
+                                                                            Speed of delivery messages is comparable with POST method.
+                                                                            Ignores POST, SEND delivery methods. It always send messages in utf-16. 
+                                                                            Allowed <Message> types:
+                                                                                bytes or str            Text message.
+                                                                                Key                     Key message, both down and up.
+                                                                                tuple(Key, KeyState)    Key message.
+                                                                
+                                                                            Example: send_to_window("Some Game", Input(Key.ENTER, "/exit", Key.ENTER), Wait(0.1))
+                                                                
+                                                                            Note: If send_to_window function is called from callback function, it might fail. 
+                                                                            This might happen because it's called from non main thread. In this case try use POST delivery method.
+                                                                            
+                                            Delay                           Sets a delay. It's performed after each action of type: bytes, str, Key, tuple(Key, KeyState), Input
+
+                                            Wait                            Performs wait a single time for given amount of time.
+                                                                            Note: It's a good practice to put one as last action. To give function time to process all messages.
+
+    raise ArgumentFail, SetupFail, DeliverMessageFail, CleanupFail, FindTargetWindowFail.
     """
     target_window = NULL
 
@@ -72,6 +133,8 @@ def send_to_window(target_window_name, *actions):
         raise FindTargetWindowFail(target_window_name, True)
 
     send_to_window_by_handle(target_window, actions)
+
+################################################################################
 
 def send_to_window_by_handle(target_window, actions):
     """
@@ -155,6 +218,11 @@ def focus_and_send_messages(target_window, foreground_window, actions):
     SetFocus(foreground_window)
 
 def try_set_foreground_window(window, max_num_of_tries = 10, interval = 0.01):
+    """
+    max_num_of_tries    : int
+    interval            : float         In seconds.
+    return bool
+    """
     num_of_tries_left = max_num_of_tries
 
     while num_of_tries_left:
@@ -296,7 +364,7 @@ def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
 
     if key in [Key.ALT, Key.LALT, Key.RALT]:
         # Note: Alt (especially right Alt) keystroke sends more than WM_KEYDOWN and WM_KEYUP message.
-        # Couldn't find clear specification which describes what is actually done.
+        # Couldn't find clear specification which describes what is actually sent and in what format.
         # SendInput() function sends this keystroke correctly.
         raise DeliverMessageFail("Can not deliver message with unsupported key: %s. (use Input() instead)" % key.name)
 
@@ -342,11 +410,11 @@ def deliver_input(window, actions):
     inputs = [] # list(INPUT)
 
     for action in actions:
-        if isinstance(action, (bytes, str)): # text
+        if isinstance(action, (bytes, str)):        # text
             inputs += make_text_input(action)
-        elif isinstance(action, Key): # key
+        elif isinstance(action, Key):               # key
             inputs += make_key_input(action, KeyState.DOWN_AND_UP)
-        elif is_key_and_key_state_tuple(action): # key
+        elif is_key_and_key_state_tuple(action):    # (key, state)
             inputs += make_key_input(action[0], action[1])
         else:
             raise DeliverMessageFail("Can not process unexpected (for Input) action type: %s." % type(action).__name__)
@@ -364,7 +432,7 @@ def make_text_input(text):
     text : bytes or str
     return list(INPUT)
     """
-    inputs = [] # INPUT
+    inputs = [] # list(INPUT)
 
     text = to_utf16(text)
 
@@ -399,7 +467,7 @@ def make_key_input(key, key_state):
     key_state   : KeyState
     return list(INPUT)
     """
-    inputs = [] # INPUT
+    inputs = [] # list(INPUT)
 
     vk_code       = key_to_vk_code(key)
     scan_code     = MapVirtualKeyW(vk_code, MAPVK_VK_TO_VSC)

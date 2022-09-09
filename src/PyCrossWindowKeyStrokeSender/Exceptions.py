@@ -40,13 +40,13 @@ __all__ = [
 class Fail(Exception):
     error_code  = 0          # int
 
-    def __init__(self, message, is_winapi_last_error = False):
+    def __init__(self, message, is_last_winapi_error = False):
         """
-        message         : str
-        is_last_error   : bool
+        message                 : str
+        is_last_winapi_error    : bool
         """
         full_message = "CWKSS Error: %s" % message
-        if is_winapi_last_error:
+        if is_last_winapi_error:
             self.error_code = GetLastError()
             full_message += " (windows error code: %d)" % self.error_code
         super().__init__(full_message)
@@ -54,45 +54,45 @@ class Fail(Exception):
 ### General Fails ###
 
 class ArgumentFail(Fail):
-    def __init__(self, message, is_winapi_last_error = False):
+    def __init__(self, message, is_last_winapi_error = False):
         """
-        message         : str
-        is_last_error   : bool
+        message                 : str
+        is_last_winapi_error    : bool
         """
-        super().__init__(message, is_winapi_last_error)
+        super().__init__(message, is_last_winapi_error)
 
 class SetupFail(Fail):
-    def __init__(self, message, is_winapi_last_error = False):
+    def __init__(self, message, is_last_winapi_error = False):
         """
-        message         : str
-        is_last_error   : bool
+        message                 : str
+        is_last_winapi_error    : bool
         """
-        super().__init__(message, is_winapi_last_error)
+        super().__init__(message, is_last_winapi_error)
 
 class DeliverMessageFail(Fail):
-    def __init__(self, message, is_winapi_last_error = False):
+    def __init__(self, message, is_last_winapi_error = False):
         """
-        message         : str
-        is_last_error   : bool
+        message                 : str
+        is_last_winapi_error    : bool
         """
-        super().__init__(message, is_winapi_last_error)
+        super().__init__(message, is_last_winapi_error)
 
 class CleanupFail(Fail):
-    def __init__(self, message, is_winapi_last_error = False):
+    def __init__(self, message, is_last_winapi_error = False):
         """
-        message         : str
-        is_last_error   : bool
+        message                 : str
+        is_last_winapi_error    : bool
         """
-        super().__init__(message, is_winapi_last_error)
+        super().__init__(message, is_last_winapi_error)
 
 ### Specific Fails ###
 
 class FindTargetWindowFail(Fail):
-    def __init__(self, window_name, is_last_error = False):
+    def __init__(self, window_name, is_last_winapi_error = False):
         """
-        is_last_error   : bool
+        is_last_winapi_error    : bool
         """
-        super().__init__("Can not find target window with name \"%s\"." % window_name, is_last_error)
+        super().__init__("Can not find target window with name \"%s\"." % window_name, is_last_winapi_error)
 
 
         

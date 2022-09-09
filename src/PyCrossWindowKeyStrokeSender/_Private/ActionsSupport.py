@@ -143,6 +143,10 @@ def key_to_vk_code(key):
 
 
 def is_ext_virtuel_key(vk_code):
+    """
+    vk_code : int       WinApi Virtual Key Code.
+    return bool
+    """
     return vk_code in [
         VK_INSERT,
         VK_DELETE,
