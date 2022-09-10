@@ -154,7 +154,7 @@ cwkss.send_to_window(
     cwkss.Wait(0.1))
 ```
 
-### Post
+## Post
 Sends text or key messages to target window message queue, where they waits to be executed. **Can be called from non main thread.**
 
 ### Game Post Example
