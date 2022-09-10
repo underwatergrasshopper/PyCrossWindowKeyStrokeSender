@@ -120,10 +120,10 @@ cwkss.send_to_window(
     cwkss.Wait(0.1))
 ```
 
----
-
 ## Sent
 Sends text messages or key messages (does not simulate key strokes) directly to window and for each message separately waits until it's processed by target window.
+
+### Game Sent Example
 
 Sends `/kills` command to "Path of Exile" game window. 
 At the end waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
@@ -154,10 +154,10 @@ cwkss.send_to_window(
     cwkss.Wait(0.1))
 ```
 
----
-
 ### Post
 Sends text or key messages to target window message queue, where they waits to be executed. **Can be called from non main thread.**
+
+### Game Post Example
 
 Sends `/kills` command to "Path of Exile" game window. 
 If multiple messages are sent, delay (`Delay(0.01)`) should be set. 
