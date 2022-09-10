@@ -103,6 +103,13 @@ if __name__ == "__main__":
         # input - double backspace
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input(cwkss.Key.BACKSPACE, cwkss.Key.BACKSPACE))
 
+
+        # other
+        #cwkss.send_to_window("Untitled - Notepad", "Some text.\nAnother text.\n", cwkss.Wait(0.1))
+        #cwkss.send_to_window("Untitled - Notepad", cwkss.Delay(0.01), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER), cwkss.Wait(0.1))
+
+        #cwkss.send_to_window("Path of Exile", cwkss.Input(cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER), cwkss.Wait(0.1))
+
         pass
     except cwkss.Fail as fail:
         print(fail)
