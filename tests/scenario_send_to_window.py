@@ -23,28 +23,29 @@
 ################################################################################
 
 import PyCrossWindowKeyStrokeSender as cwkss
+import os
 
 cwkss.enable_debug()
 
 if __name__ == "__main__":
     try:
         # find window
-        #cwkss.send_to_window(b"*Untitled - Notepad")
         #cwkss.send_to_window("*Untitled - Notepad")
+        #cwkss.send_to_window(b"*Untitled - Notepad")
 
         # undefined action type
-        #cwkss.send_to_window(b"*Untitled - Notepad", (False))
+        #cwkss.send_to_window("*Untitled - Notepad", (False))
 
         # send text ascii
-        #cwkss.send_to_window(b"*Untitled - Notepad", b"Some text.", "Other text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, b"Some text.", "Other text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, cwkss.SEND, b"Some text.", "Other text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.ASCII, cwkss.POST, b"Some text.", "Other text.")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ASCII, "Some text.", "Other text.")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ASCII, cwkss.SEND, "Some text.", "Other text.")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.ASCII, cwkss.POST, "Some text.", "Other text.")
 
         # send text utf-16
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, b"Some text.", "Other text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, cwkss.SEND, b"Some text.", "Other text.")
-        #cwkss.send_to_window(b"*Untitled - Notepad", cwkss.UTF16, cwkss.POST, b"Some text.", "Other text.")
+        #cwkss.send_to_window(b"*Untitled - Notepad", "Some text.\u0444", "Other text.\U00024B62")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.UTF16, "Some text.\u0444", "Other text.\U00024B62")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.UTF16, cwkss.SEND, "Some text.\u0444", "Other text.\U00024B62")
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.UTF16, cwkss.POST, "Some text.\u0444", "Other text.\U00024B62")
 
         # wait
         #cwkss.send_to_window("*Untitled - Notepad", "Some text.", cwkss.Wait(3), "Another text.")
@@ -69,6 +70,7 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Simple Window 안녕하세요", cwkss.Key.LCTRL, cwkss.Key.RCTRL, cwkss.Key.LALT, cwkss.Key.RALT, cwkss.Key.LSHIFT, cwkss.Key.RSHIFT, cwkss.Wait(0.1))
 
         # input
+        #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.\u0444\U00024B62", cwkss.Key.ENTER))
         #cwkss.send_to_window("*Untitled - Notepad", cwkss.Delay(0.1), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER))
         #cwkss.send_to_window("Path of Exile", cwkss.Input(cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER), cwkss.Wait(0.1))
 
@@ -109,6 +111,10 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Untitled - Notepad", cwkss.Delay(0.01), cwkss.Input("Some text.", cwkss.Key.ENTER, "Another text.", cwkss.Key.ENTER), cwkss.Wait(0.1))
 
         #cwkss.send_to_window("Path of Exile", cwkss.Input(cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER), cwkss.Wait(0.1))
+
+        #cwkss.send_to_window("Command Prompt", cwkss.Wait(1), cwkss.Input("notepad"), cwkss.Wait(1), cwkss.Input(cwkss.Key.ENTER), cwkss.Wait(0.1))
+        #cwkss.send_to_window("Untitled - Notepad", cwkss.Wait(1), cwkss.Delay(2), "Some text.\n", "Another text.", "\n\u0444\U00024B62", cwkss.Wait(0.1))
+
 
         pass
     except cwkss.Fail as fail:

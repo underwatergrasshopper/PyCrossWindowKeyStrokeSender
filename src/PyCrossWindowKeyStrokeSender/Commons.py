@@ -23,26 +23,20 @@
 ################################################################################
 
 __all__ = [
-    "to_utf16",
-    "to_bytes",
+    "to_utf16_codes",
 ]
 
-def to_utf16(text):
+def to_utf16_codes(text):
     """
-    text    : bytes or str
-    return  : str               Text in utf-16 encoding format.
+    Converts text to list of utf-16 codes.
+    text : str
+    return list(int)
     """
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
-    return text.encode("utf-16").decode("utf-16")
+    codes = text.encode("utf-16-be")
 
-def to_bytes(text):
-    """
-    text    : bytes or str
-    return  : bytes             Text in ascii format.
-    """
-    if isinstance(text, bytes):
-        return text
-    return text.encode("utf-8")
+    utf16_codes = []
+    for ix in range(0, len(codes), 2):
+        utf16_codes += [(codes[ix] << 8) | codes[ix + 1]]
 
+    return utf16_codes
 

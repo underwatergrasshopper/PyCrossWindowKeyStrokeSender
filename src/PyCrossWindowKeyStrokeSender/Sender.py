@@ -39,7 +39,9 @@ def send_to_window(target_window_name, *actions):
     """
     Delivers keyboard key and text messages to the target window.
 
-    target_window name : bytes or str       Name of the window to which messages will be sent.
+    target_window name : str or bytes       Name of the window to which messages will be sent.
+                                            Note: If bytes then is interpreted as ascii string.
+                                            If str then is interpreted as unicode string.
     actions : <Action>, ...                 Actions to be performed in the same order as they are in arguments.
                                             Allowed <Action> types:
                                             
@@ -59,14 +61,14 @@ def send_to_window(target_window_name, *actions):
                                                                             send_to_window("Some Window", Delay(0.1), SEND, "Some text.", "Some other text", POST, u"Some another text", Wait(0.1)) 
                                                                 
                                                                 
-                                            UTF16                           Messages will be delivered as utf-16 messages. 
+                                            UTF16                           (Default) Messages will be delivered as utf-16 messages. 
                                                                             Use this action, if text messages have any unicode character in any encoding format (utf-8, utf-16, utf-32).
-                                                                            Example: send_to_window("Some Window", UTF16, u"Some text. \u0444", Wait(0.1))
+                                                                            Example: send_to_window("Some Window", UTF16, "Some text. \u0444", Wait(0.1))
                                                                 
                                                                             Note: Uses internally winapi functions with W suffix.
                                                                 
                                                                 
-                                            ASCII                           (Default) Messages will be delivered as ascii messages. 
+                                            ASCII                           Messages will be delivered as ascii messages. 
                                                                             Use this action if text message have only ascii characters.
                                                                             Example: send_to_window("Some Window", "Some text.", Wait(0.1)) 
                                                                             Example: send_to_window("Some Window", ASCII, "Some text.", Wait(0.1)) 
@@ -77,7 +79,7 @@ def send_to_window(target_window_name, *actions):
                                                                             send_to_window("Some Window", ASCII, "Some ascii text.", "Some other ascii text", UTF16, u"Some unicode text \u0444", Wait(0.1)) 
                                                                 
                                                                 
-                                            bytes or str                    Text message.
+                                            str                             Text message.
                                                                 
                                                                 
                                             Key                             Key message. Both key down and key up message. First down and then up will be delivered.
@@ -93,7 +95,7 @@ def send_to_window(target_window_name, *actions):
                                                                             Speed of delivery messages is comparable with POST method.
                                                                             Ignores POST, SEND delivery methods. It always send messages in utf-16. 
                                                                             Allowed <Message> types:
-                                                                                bytes or str            Text message.
+                                                                                str            Text message.
                                                                                 Key                     Key message, both down and up.
                                                                                 tuple(Key, KeyState)    Key message.
                                                                 
@@ -115,14 +117,12 @@ def send_to_window(target_window_name, *actions):
     # "...", u"...", U"..."     -> utf-16   (...W)
 
     if isinstance(target_window_name, bytes):
-        debug_print("target_window_name ascii: ", to_utf16(target_window_name))
+        debug_print("target_window_name ascii: ", target_window_name.decode("utf-8"))
 
         target_window = FindWindowA(NULL, target_window_name)
 
         debug_print("target_window handle: ", target_window)
     else:
-        target_window_name = to_utf16(target_window_name)
-
         debug_print("target_window_name utf-16: ", target_window_name)
 
         target_window = FindWindowW(NULL, target_window_name)
@@ -250,12 +250,12 @@ def deliver_messages(focus_window, actions):
     """
     debug_print("actions: ", *actions)
 
-    encoding_type_id        = EncodingTypeID.ASCII
+    encoding_type_id        = EncodingTypeID.UTF16
     delivery_type_id        = DeliveryTypeID.SEND
-    delay                   = 0.0           # in seconds
+    delay                   = 0.0                   # in seconds
 
     for action in actions:
-        if isinstance(action, (bytes, str)):        # text
+        if isinstance(action, str):                 # text
             debug_print("deliver text message")
             deliver_text(focus_window, action, encoding_type_id, delivery_type_id)
 
@@ -299,11 +299,10 @@ def deliver_messages(focus_window, actions):
         else:
             raise ArgumentFail("Can not process unexpected action type: %s." % type(action).__name__)
 
-
 def deliver_text(window, text, encoding_type_id, delivery_type_id):
     """
     window              : HWND
-    text                : str or bytes
+    text                : str
     encoding_type_id    : EncodingTypeID
     delivery_type_id    : DeliveryTypeID
     """
@@ -311,30 +310,30 @@ def deliver_text(window, text, encoding_type_id, delivery_type_id):
     debug_print("delivery_type_id: ", delivery_type_id.name)
 
     if encoding_type_id == EncodingTypeID.ASCII:
-        text = to_bytes(text)
+        codes = text.encode("utf-8")
 
         if delivery_type_id == DeliveryTypeID.SEND:
-            for sign in text:
-                SendMessageA(window, WM_CHAR, sign, 0)
+            for code in codes:
+                SendMessageA(window, WM_CHAR, code, 0)
 
         elif delivery_type_id == DeliveryTypeID.POST:
-            for sign in text:
-                if not PostMessageA(window, WM_CHAR, sign, 0):
-                    raise DeliverMessageFail("Can not deliver ascii message: \"%s\"" % to_utf16(text))
+            for code in codes:
+                if not PostMessageA(window, WM_CHAR, code, 0):
+                    raise DeliverMessageFail("Can not deliver ascii message: \"%s\"" % text)
         else:
             raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
 
     elif encoding_type_id == EncodingTypeID.UTF16:
-        text = to_utf16(text)
+        codes = to_utf16_codes(text)
 
         if delivery_type_id == DeliveryTypeID.SEND:
-            for sign in text:
-                SendMessageW(window, WM_CHAR, ord(sign), 0)
+            for code in codes:
+                SendMessageW(window, WM_CHAR, code, 0)
 
         elif delivery_type_id == DeliveryTypeID.POST:
-            for sign in text:
-                if not PostMessageW(window, WM_CHAR, ord(sign), 0):
-                    raise DeliverMessageFail("Can not deliver utf-16 message: \"%s\"" % to_utf16(text))
+            for code in codes:
+                if not PostMessageW(window, WM_CHAR, code, 0):
+                    raise DeliverMessageFail("Can not deliver utf-16 message: \"%s\"" % text)
         else:
             raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
     else:
@@ -429,19 +428,19 @@ def deliver_input(window, actions):
 
 def make_text_input(text):
     """
-    text : bytes or str
+    text : str
     return list(INPUT)
     """
     inputs = [] # list(INPUT)
 
-    text = to_utf16(text)
+    codes = to_utf16_codes(text)
 
-    for sign in text:
+    for code in codes:
         input = INPUT()
 
         input.type              = INPUT_KEYBOARD
         input.ki.wVk            = 0
-        input.ki.wScan          = ord(sign)
+        input.ki.wScan          = code
         input.ki.time           = 0
         input.ki.dwFlags        = KEYEVENTF_UNICODE
         input.ki.dwExtraInfo    = 0
@@ -452,7 +451,7 @@ def make_text_input(text):
 
         input.type              = INPUT_KEYBOARD
         input.ki.wVk            = 0
-        input.ki.wScan          = ord(sign)
+        input.ki.wScan          = code
         input.ki.time           = 0
         input.ki.dwFlags        = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP
         input.ki.dwExtraInfo    = 0

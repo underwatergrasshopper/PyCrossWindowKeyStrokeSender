@@ -56,13 +56,9 @@ An action can be one of the following types.
     Input
 
 <SimpleMessage>
-    <Text>
+    str
     Key
     tuple(Key, KeyAction)
-
-<Text>
-    str
-    bytes
 """
 
 class Key(Enum):
@@ -198,18 +194,18 @@ class DeliveryTypeID(Enum):
     SEND = 0
     POST = 1
 
-SEND = DeliveryTypeID.SEND
-POST = DeliveryTypeID.POST
+SEND    = DeliveryTypeID.SEND
+POST    = DeliveryTypeID.POST
 
 class EncodingTypeID(Enum):
     """
     Text message encoding format type.
     """
-    ASCII = 0
-    UTF16 = 1
+    ASCII   = 0
+    UTF16   = 1
 
-ASCII = EncodingTypeID.ASCII
-UTF16 = EncodingTypeID.UTF16
+ASCII   = EncodingTypeID.ASCII
+UTF16   = EncodingTypeID.UTF16
 
 class Wait:
     def __init__(self, wait_time):
