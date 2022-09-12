@@ -1,14 +1,24 @@
 ﻿# PyCrossWindowKeyStrokeSender
 Small module which provides ability to send a key messages or text messages to chosen window.
 
+Module is exclusively for operating systems from Windows family (Windows 7/8/10).
+
+### HOWTO Install
+
+Go to releases section and download last release package (either with `tar.gz` or `whl` extension).
+Run `pip install PyCrossWindowKeyStrokeSender-<version>.tar.gz` or `pip install PyCrossWindowKeyStrokeSender-<version>.whl` (depends which type of packed is downloaded) in directory where is the package.
+
+### HOWTO Unistall
+
+Run `pip uninstall PyCrossWindowKeyStrokeSender`.
+
+# HOWTO Send Messages
 There are three ways of sending message to window: Input, Send, Post.
 
 If one of the method do not work, try another. Input method is most reliable.
 
 *Note: For Input and Send methods, `send_to_window` functions should be called from main thread. 
 Sometimes callback functions are called from non main threads. In this case, Input and Sent methods might not work, if `send_to_window` function is called from inside of that callback function.*
-
----
 
 ## Input
 Simulates series of keyboard key strokes. 
@@ -142,7 +152,15 @@ Messages can be send as ascii messages (`cwkss.ASCII`), if target window does no
 ```python
 import PyCrossWindowKeyStrokeSender as cwkss
 
-cwkss.send_to_window("Path of Exile", cwkss.ASCII, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
+cwkss.send_to_window(
+    "Path of Exile", 
+    cwkss.ASCII, 
+
+    cwkss.Key.ENTER, 
+    "/kills", 
+    cwkss.Key.ENTER, 
+
+    cwkss.Wait(0.1))
 ```
 
 Sends `/kills` command and `/played` command to "Path of Exile" game window. 
@@ -182,9 +200,11 @@ cwkss.send_to_window(
     "Path of Exile", 
     cwkss.POST, 
     cwkss.Delay(0.01), 
+
     cwkss.Key.ENTER, 
     "/kills", 
     cwkss.Key.ENTER, 
+
     cwkss.Wait(0.1))
 ```
 
@@ -193,5 +213,14 @@ Messages can be send as ascii messages (`cwkss.ASCII`), if target window does no
 ```python
 import PyCrossWindowKeyStrokeSender as cwkss
 
-cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.ASCII, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
+cwkss.send_to_window(
+    "Path of Exile", 
+    cwkss.POST, 
+    cwkss.ASCII, 
+
+    cwkss.Key.ENTER, 
+    "/kills", 
+    cwkss.Key.ENTER, 
+
+    cwkss.Wait(0.1))
 ```
