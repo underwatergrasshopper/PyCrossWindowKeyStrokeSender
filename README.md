@@ -5,8 +5,10 @@ Module is exclusively for operating systems from Windows family (Windows 7/8/10)
 
 ### HOWTO Install
 
-Go to releases section and download last release package (either with `tar.gz` or `whl` extension).
-Run `pip install PyCrossWindowKeyStrokeSender-<version>.tar.gz` or `pip install PyCrossWindowKeyStrokeSender-<version>.whl` (depends which type of packed is downloaded) in directory where is the package.
+Go to releases section and download last release package with `tar.gz` extension.
+Run `pip install PyCrossWindowKeyStrokeSender-<version>.tar.gz` in directory where is the package.
+
+*Note: The `<version>` in install command need to be replaced with a version of the package.*
 
 ### HOWTO Unistall
 
@@ -131,10 +133,10 @@ cwkss.send_to_window(
     cwkss.Wait(0.1))
 ```
 
-## Sent
+## Send
 Sends text messages or key messages (does not simulate key strokes) directly to window and for each message separately waits until it's processed by target window.
 
-### Game Sent Example
+### Game Send Example
 
 Sends `/kills` command to "Path of Exile" game window. 
 At the end waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
