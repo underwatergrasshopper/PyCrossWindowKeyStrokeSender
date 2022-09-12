@@ -6,17 +6,18 @@ There are three ways of sending message to window: Input, Send, Post.
 If one of the method do not work, try another. Input method is most reliable.
 
 *Note: For Input and Send methods, `send_to_window` functions should be called from main thread. 
-Sometimes callback functions are called from non main threads. In this case, Input and Sent methods might not work, if `send_to_window` function is called from that callback function.*
+Sometimes callback functions are called from non main threads. In this case, Input and Sent methods might not work, if `send_to_window` function is called from inside of that callback function.*
 
 ---
 
 ## Input
-Simulates keyboard key strokes. 
+Simulates series of keyboard key strokes. 
 
 ### Game Input Example
 
 Sends `/kills` command to "Path of Exile" game window. 
-At the end waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
+At the end, waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
+All text messages are sent as messages in utf-16 encoding format.
 
 *Note: The given wait time depends on: length of messages, speed of the processor, target window reactability.*
 
@@ -136,6 +137,14 @@ import PyCrossWindowKeyStrokeSender as cwkss
 cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
 ```
 
+Messages can be send as ascii messages (`cwkss.ASCII`), if target window does not support receiving messages in utf-16 encoding format.
+
+```python
+import PyCrossWindowKeyStrokeSender as cwkss
+
+cwkss.send_to_window("Path of Exile", cwkss.ASCII, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
+```
+
 Sends `/kills` command and `/played` command to "Path of Exile" game window. 
 ```python
 import PyCrossWindowKeyStrokeSender as cwkss
@@ -161,8 +170,8 @@ Sends text or key messages to target window message queue, where they waits to b
 
 Sends `/kills` command to "Path of Exile" game window. 
 If multiple messages are sent, delay (`Delay(0.01)`) should be set. 
-It makes send_to_window function waits, after each sent message, a delay time, before sending another message, to make relatively sure, those messages do not collide with each other.
-At the end waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
+It makes send_to_window function to wait, after each sent message, a delay time, before sending another message, to make relatively sure, those messages do not collide with each other.
+At the end, waits (`cwkss.Wait(0.1)`) for some amount of time to give the target window a time to process messages. 
 
 *Note: The given wait time depends on: length of messages, speed of the processor, target window reactability.*
 
@@ -177,4 +186,12 @@ cwkss.send_to_window(
     "/kills", 
     cwkss.Key.ENTER, 
     cwkss.Wait(0.1))
+```
+
+Messages can be send as ascii messages (`cwkss.ASCII`), if target window does not support receiving messages in utf-16 encoding format.
+
+```python
+import PyCrossWindowKeyStrokeSender as cwkss
+
+cwkss.send_to_window("Path of Exile", cwkss.POST, cwkss.ASCII, cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, cwkss.Wait(0.1))
 ```
