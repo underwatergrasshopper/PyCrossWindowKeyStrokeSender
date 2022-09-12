@@ -29,13 +29,7 @@ def test_dummy():
     assert(True)
 
 def test_to_utf16():
-    assert(cwkss.to_utf16(b"abc") == u"abc")
-    assert(cwkss.to_utf16("abc") == u"abc")
-    assert(cwkss.to_utf16(u"abc") == u"abc")
-    assert(cwkss.to_utf16(U"abc") == u"abc")
+    assert(cwkss.to_utf16_codes(u"\u015B")      == [0x015B])
+    assert(cwkss.to_utf16_codes(u"\u0444")      == [0x0444])
+    assert(cwkss.to_utf16_codes(u"\U00024B62")  == [0xD852, 0xDF62])
 
-def test_to_bytes():
-    assert(cwkss.to_bytes(b"abc") == b"abc")
-    assert(cwkss.to_bytes("abc") == b"abc")
-    assert(cwkss.to_bytes(u"abc") == b"abc")
-    assert(cwkss.to_bytes(U"abc") == b"abc")

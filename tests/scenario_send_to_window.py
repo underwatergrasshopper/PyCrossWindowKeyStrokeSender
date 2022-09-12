@@ -115,7 +115,6 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Command Prompt", cwkss.Wait(1), cwkss.Input("notepad"), cwkss.Wait(1), cwkss.Input(cwkss.Key.ENTER), cwkss.Wait(0.1))
         #cwkss.send_to_window("Untitled - Notepad", cwkss.Wait(1), cwkss.Delay(2), "Some text.\n", "Another text.", "\n\u0444\U00024B62", cwkss.Wait(0.1))
 
-
         pass
     except cwkss.Fail as fail:
         print(fail)
