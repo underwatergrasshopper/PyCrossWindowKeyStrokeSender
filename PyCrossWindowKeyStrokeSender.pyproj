@@ -48,6 +48,7 @@
   <ItemGroup>
     <Content Include=".gitignore" />
     <Content Include="Build.bat" />
+    <Content Include="CHANGELOG.md" />
     <Content Include="LICENSE" />
     <Content Include="pyproject.toml" />
     <Content Include="README.md" />

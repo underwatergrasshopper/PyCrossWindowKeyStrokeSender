@@ -115,6 +115,128 @@ if __name__ == "__main__":
         #cwkss.send_to_window("Command Prompt", cwkss.Wait(1), cwkss.Input("notepad"), cwkss.Wait(1), cwkss.Input(cwkss.Key.ENTER), cwkss.Wait(0.1))
         #cwkss.send_to_window("Untitled - Notepad", cwkss.Wait(1), cwkss.Delay(2), "Some text.\n", "Another text.", "\n\u0444\U00024B62", cwkss.Wait(0.1))
 
+        ### README.md ###
+
+        # Input Example 1
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.Input("Some Text.\nOther text.\n"),
+                cwkss.Wait(0.1))
+
+        # Input Example 2
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.Input(U"Some Text.\nOther text.\nф𤭢\n"),
+                cwkss.Wait(0.1))
+        
+        # Input Example 3
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.Input(
+                    "Some Text.",
+                    cwkss.Key.ENTER,
+                    "Other Text.",
+                    cwkss.Key.ENTER),
+                cwkss.Wait(0.1))
+
+        # Input Example 4
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.Delay(0.01),
+                cwkss.Input("Some Text."),
+                cwkss.Input(cwkss.Key.ENTER),
+                cwkss.Input("Other Text."),
+                cwkss.Input(cwkss.Key.ENTER),
+                cwkss.Wait(0.1))
+
+        # Input Example 5
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.Input(
+                    (cwkss.Key.RALT, cwkss.KeyState.DOWN),
+                    cwkss.Key.S,
+                    (cwkss.Key.RALT, cwkss.KeyState.UP)),
+                cwkss.Wait(0.1))
+
+        # Input Example 6
+        if False:
+            cwkss.send_to_window(
+                "Path of Exile", 
+                cwkss.Input(
+                    cwkss.Key.ENTER,
+                    "/kills",
+                    cwkss.Key.ENTER),
+                cwkss.Wait(0.1))
+
+        # Send Example 1
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                "Some Text.\nOther text.\n")
+
+        # Send Example 2
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.UTF16,
+                U"Some Text.\nOther text.\nф𤭢\n")
+
+        # Send Example 3
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                "Some Text.\n",
+                "Other Text.\n")
+
+        # Send Example 4
+        if False:
+            cwkss.send_to_window(
+                "Path of Exile", 
+                cwkss.Key.ENTER,
+                "/kills",
+                cwkss.Key.ENTER)
+
+        # Post Example 1
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.POST,
+                cwkss.Delay(0.01),
+                "Some Text.\nOther text.\n")
+
+        # Post Example 2
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.UTF16,
+                cwkss.POST,
+                cwkss.Delay(0.01),
+                U"Some Text.\nOther text.\nф𤭢\n")
+
+        # Post Example 3
+        if False:
+            cwkss.send_to_window(
+                "Untitled - Notepad", 
+                cwkss.POST,
+                cwkss.Delay(0.01),
+                "Some Text.\n",
+                "Other Text.\n")
+
+        # Post Example 4
+        if False:
+            cwkss.send_to_window(
+                "Path of Exile", 
+                cwkss.POST,
+                cwkss.Delay(0.01),
+                cwkss.Key.ENTER,
+                "/kills",
+                cwkss.Key.ENTER)
+
         pass
     except cwkss.Fail as fail:
         print(fail)
