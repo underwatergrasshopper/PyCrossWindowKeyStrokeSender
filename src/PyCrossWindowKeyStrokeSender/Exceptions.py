@@ -38,13 +38,15 @@ __all__ = [
 ]
 
 class Fail(Exception):
-    error_code  = 0          # int
+    # error_code : int
 
     def __init__(self, message, is_last_winapi_error = False):
         """
         message                 : str
         is_last_winapi_error    : bool
         """
+        self.error_code  = 0    
+
         full_message = "CWKSS Error: %s" % message
         if is_last_winapi_error:
             self.error_code = GetLastError()

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as file:
 
 setuptools.setup(
     name                            = "PyCrossWindowKeyStrokeSender",
-    version                         = "0.1.3",
+    version                         = "0.1.4",
     author                          = "underwatergrasshopper",
     author_email                    = "",
     description                     = "Simple library for sending keystrokes to chosen window.",

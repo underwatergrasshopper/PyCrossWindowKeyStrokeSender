@@ -179,7 +179,7 @@ class KeyState:
     DOWN_AND_UP = DOWN | UP
 
 class Input:
-    actions = () # tuple(<SimpleMessage>)
+    # actions : tuple(<SimpleMessage>)
 
     def __init__(self, *actions):
         """
