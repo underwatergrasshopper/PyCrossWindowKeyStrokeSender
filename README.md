@@ -12,8 +12,9 @@ Module is exclusively for operating systems from Windows family (Windows 7/8/10)
 
 ## Install
 
-Go to releases section and download last release package with `tar.gz` extension.
-Run `pip install PyCrossWindowKeyStrokeSender-<version>.tar.gz` in directory where is the package.
+Go to releases section and download last release package with `whl` extension.
+Run `pip install PyCrossWindowKeyStrokeSender-<version>-py3-none-win32.whl` in directory where is the package, if your python version is 32bit.
+Run `pip install PyCrossWindowKeyStrokeSender-<version>-py3-none-win_amd64.whl` in directory where is the package, if your python version is 64bit.
 
 *Note: The `<version>` in install command need to be replaced with a version of the package.*
 
