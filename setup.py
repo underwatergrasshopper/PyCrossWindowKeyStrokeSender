@@ -4,15 +4,17 @@ from pathlib import Path
 
 PROJECT_PATH = Path(__file__).parent.resolve()
 
-long_description = (PROJECT_PATH / "README.md").read_text(encoding="utf-8")
+NAME                = "PyCrossWindowKeyStrokeSender"
+VERSION             = (PROJECT_PATH / "src" / NAME / "version").read_text("utf-8").strip()
+LONG_DESCRIPTION    = (PROJECT_PATH / "README.md").read_text("utf-8")
 
 
 setup(
-    name                            = "PyCrossWindowKeyStrokeSender", 
-    version                         = "0.1.5+dev",
+    name                            = NAME, 
+    version                         = VERSION,
     author                          = "underwatergrasshopper",
     description                     = "Simple library for sending keystrokes to chosen window.",
-    long_description                = long_description,
+    long_description                = LONG_DESCRIPTION,
     long_description_content_type   = "text/markdown",
 
     url                             = "https://github.com/underwatergrasshopper/PyCrossWindowKeyStrokeSender",
@@ -25,9 +27,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    package_dir                     = {"": "src"},
+    package_dir                     = {"" : "src"},
     packages                        = find_packages(where = "src"),
-    install_requires                = [],
+    package_data                    = {NAME : ["version"]},
     license                         = "MIT",
     python_requires                 = "==3.11.*",
 )
