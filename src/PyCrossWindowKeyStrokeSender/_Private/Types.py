@@ -25,6 +25,7 @@ LONG_PTR                = _w.LPARAM
 LRESULT                 = LONG_PTR
 
 ULONG_PTR               = _w.WPARAM
+HWND                    = _w.HWND
 
 SW_RESTORE              = 9
 

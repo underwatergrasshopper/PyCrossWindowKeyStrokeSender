@@ -1,77 +1,42 @@
-from .Commons           import *
-from ._Private.Types    import *
 
-from enum               import Enum
+from ._Private import Types as _t
 
-__all__ = [
-    "Fail",
-
-    "ArgumentFail",
-    "SetupFail",
-    "DeliverMessageFail",
-    "CleanupFail",
-
-    "FindTargetWindowFail",
-]
 
 class Fail(Exception):
-    # error_code : int
+    _error_code : int
 
-    def __init__(self, message, is_last_winapi_error = False):
-        """
-        message                 : str
-        is_last_winapi_error    : bool
-        """
-        self.error_code  = 0    
+    def __init__(self, message : str, is_last_winapi_error : bool = False):
+        self._error_code  = 0    
 
-        full_message = "CWKSS Error: %s" % message
+        full_message = f"CWKSS Error: {message}"
         if is_last_winapi_error:
-            self.error_code = GetLastError()
-            full_message += " (windows error code: %d)" % self.error_code
+            self._error_code = _t.GetLastError()
+            full_message += f" (windows error code: {self._error_code})"
+
         super().__init__(full_message)
 
 ### General Fails ###
 
 class ArgumentFail(Fail):
-    def __init__(self, message, is_last_winapi_error = False):
-        """
-        message                 : str
-        is_last_winapi_error    : bool
-        """
-        super().__init__(message, is_last_winapi_error)
+    pass
+
 
 class SetupFail(Fail):
-    def __init__(self, message, is_last_winapi_error = False):
-        """
-        message                 : str
-        is_last_winapi_error    : bool
-        """
-        super().__init__(message, is_last_winapi_error)
+    pass
+
 
 class DeliverMessageFail(Fail):
-    def __init__(self, message, is_last_winapi_error = False):
-        """
-        message                 : str
-        is_last_winapi_error    : bool
-        """
-        super().__init__(message, is_last_winapi_error)
+    pass
+
 
 class CleanupFail(Fail):
-    def __init__(self, message, is_last_winapi_error = False):
-        """
-        message                 : str
-        is_last_winapi_error    : bool
-        """
-        super().__init__(message, is_last_winapi_error)
+    pass
 
 ### Specific Fails ###
 
 class FindTargetWindowFail(Fail):
-    def __init__(self, window_name, is_last_winapi_error = False):
-        """
-        is_last_winapi_error    : bool
-        """
-        super().__init__("Can not find target window with name \"%s\"." % window_name, is_last_winapi_error)
+    def __init__(self, window_name : str, is_last_winapi_error = False):
+        super().__init__(f"Can not find target window with name \"{window_name}\".", is_last_winapi_error)
 
 
         

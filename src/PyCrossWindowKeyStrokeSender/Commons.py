@@ -1,12 +1,6 @@
-__all__ = [
-    "to_utf16_codes",
-]
-
-def to_utf16_codes(text):
+def to_utf16_codes(text : str) -> list[int]:
     """
     Converts text to list of utf-16 codes.
-    text : str
-    return list(int)
     """
     codes = text.encode("utf-16-be")
 
