@@ -1,44 +1,8 @@
-from ._Private.Types    import *
-from .Commons           import *
+from enum import Enum as _Enum
+from typing import TypeAlias as _TypeAlias
 
-from enum import Enum
 
-__all__ = [
-    "Key",
-    "KeyState",
-    "Input",
-    "DeliveryTypeID",
-    "SEND",
-    "POST",
-    "EncodingTypeID",
-    "ASCII",
-    "UTF16",
-    "Wait",
-    "Delay",
-]
-
-"""
-An action can be one of the following types.
-
-<Action>
-    <Message>
-    DeliveryTypeID
-    EncodingTypeID
-    Input
-    Wait
-    Delay
-
-<Message>
-    <SimpleMessage>
-    Input
-
-<SimpleMessage>
-    str
-    Key
-    tuple(Key, KeyAction)
-"""
-
-class Key(Enum):
+class Key(_Enum):
     BREAK               = 0
     BACKSPACE           = 1
     TAB                 = 2 
@@ -149,22 +113,27 @@ class Key(Enum):
 
 class KeyState:
     """
-    Sets of bit for bitfield.
+    Bitfields.
     """
     DOWN        = 0x01
     UP          = 0x02
     DOWN_AND_UP = DOWN | UP
 
-class Input:
-    # actions : tuple(<SimpleMessage>)
 
-    def __init__(self, *actions):
-        """
-        actions : <SimpleMessage>, ...        Only simple message actions are allowed: str, bytes, Key, tuple(Key, KeyAction).
-        """
+SimpleMessage : _TypeAlias = bytes | str | Key | tuple[Key, KeyState]
+
+
+class Input:
+    actions : tuple[SimpleMessage]
+
+    def __init__(self, *actions : SimpleMessage):
         self.actions = actions
 
-class DeliveryTypeID(Enum):
+
+Message : _TypeAlias = SimpleMessage | Input
+
+
+class DeliveryTypeID(_Enum):
     """
     Message delivery type.
     """
@@ -174,7 +143,8 @@ class DeliveryTypeID(Enum):
 SEND    = DeliveryTypeID.SEND
 POST    = DeliveryTypeID.POST
 
-class EncodingTypeID(Enum):
+
+class EncodingTypeID(_Enum):
     """
     Text message encoding format type.
     """
@@ -184,6 +154,7 @@ class EncodingTypeID(Enum):
 ASCII   = EncodingTypeID.ASCII
 UTF16   = EncodingTypeID.UTF16
 
+
 class Wait:
     def __init__(self, wait_time):
         """
@@ -191,9 +162,13 @@ class Wait:
         """
         self.wait_time = wait_time
 
+
 class Delay:
     def __init__(self, delay_time):
         """
         delay_time : float      Delay time after sending each message in seconds.
         """
         self.delay_time = delay_time
+
+
+Action : _TypeAlias = Message | DeliveryTypeID | EncodingTypeID | Wait | Delay
