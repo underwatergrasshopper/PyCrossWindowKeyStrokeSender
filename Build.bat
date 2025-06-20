@@ -16,6 +16,3 @@ if "!PYTHON_VERSION!" neq "" (
 set PYTHON_TAG=py311
 
 py !PYTHON_VERSION! -m build --wheel -C--build-option=--python-tag=!PYTHON_TAG! -C--build-option=--plat-name=win-amd64
-IF %errorlevel% neq 0 (
-    exit /b 1
-)
