@@ -1,8 +1,11 @@
 @echo off
 
-if exist "./dist" rd /s /q "./dist"
-if exist "./build" rd /s /q "./build"
-if exist "./src/PyCrossWindowKeyStrokeSender.egg-info" rd /s /q "./src/PyCrossWindowKeyStrokeSender.egg-info"
-if exist "./TestResults" rd /s /q "./TestResults"
+set PROJECT_PATH=%~dp0
+
+if exist "%PROJECT_PATH%dist" rd /s /q "%PROJECT_PATH%dist"
+if exist "%PROJECT_PATH%build" rd /s /q "%PROJECT_PATH%build"
+if exist "%PROJECT_PATH%out" rd /s /q "%PROJECT_PATH%out"
+if exist "%PROJECT_PATH%src\PyCrossWindowKeyStrokeSender.egg-info" rd /s /q "%PROJECT_PATH%src\PyCrossWindowKeyStrokeSender.egg-info"
+if exist "%PROJECT_PATH%TestResults" rd /s /q "%PROJECT_PATH%TestResults"
 
 echo done
