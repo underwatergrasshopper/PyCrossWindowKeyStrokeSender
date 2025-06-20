@@ -265,7 +265,7 @@ def _deliver_messages(focus_window : _t.HWND, actions : tuple[Action]):
             delay = action.delay_time
 
         else:
-            raise ArgumentFail("Can not process unexpected action type: %s." % type(action).__name__)
+            raise ArgumentFail(f"Can not process unexpected action type: {type(action).__name__}.")
 
 
 def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
@@ -282,9 +282,9 @@ def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeI
         elif delivery_type_id == DeliveryTypeID.POST:
             for code in codes:
                 if not _t.PostMessageA(window, _t.WM_CHAR, code, 0):
-                    raise DeliverMessageFail("Can not deliver ascii message: \"%s\"" % text)
+                    raise DeliverMessageFail(f"Can not deliver ascii message: \"{text}\"")
         else:
-            raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
+            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
 
     elif encoding_type_id == EncodingTypeID.UTF16:
         codes = _to_utf16_codes(text)
@@ -296,11 +296,11 @@ def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeI
         elif delivery_type_id == DeliveryTypeID.POST:
             for code in codes:
                 if not _t.PostMessageW(window, _t.WM_CHAR, code, 0):
-                    raise DeliverMessageFail("Can not deliver utf-16 message: \"%s\"" % text)
+                    raise DeliverMessageFail(f"Can not deliver utf-16 message: \"{text}\"")
         else:
-            raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
+            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
     else:
-        raise DeliverMessageFail("Can not process unsupported encoding format: \"%s\"." % encoding_type_id.name)
+        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
 
 
 def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
@@ -320,13 +320,13 @@ def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id 
         PostMessage     = _t.PostMessageW
         MapVirtualKey   = _t.MapVirtualKeyW
     else:
-        raise DeliverMessageFail("Can not process unsupported encoding format: \"%s\"." % encoding_type_id.name)
+        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
 
     if key in [Key.ALT, Key.LALT, Key.RALT]:
         # Note: Alt (especially right Alt) keystroke sends more than WM_KEYDOWN and WM_KEYUP message.
         # Couldn't find clear specification which describes what is actually sent and in what format.
         # SendInput() function sends this keystroke correctly.
-        raise DeliverMessageFail("Can not deliver message with unsupported key: %s. (use Input() instead)" % key.name)
+        raise DeliverMessageFail(f"Can not deliver message with unsupported key: {key.name}. (use Input() instead)")
 
     vk_code       = _support.key_to_vk_code(key)
     scan_code     = MapVirtualKey(vk_code, _t.MAPVK_VK_TO_VSC)
@@ -360,7 +360,7 @@ def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id 
             if not PostMessage(window, _t.WM_KEYUP, vk_code, l_param_up):
                 raise DeliverMessageFail(f"Can not post message: {_support.key_to_vk_code(key)} UP.")
     else:
-        raise DeliverMessageFail("Can not process unsupported delivery method: \"%s\"." % delivery_type_id.name)
+        raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
 
 
 def _deliver_input(actions : tuple[SimpleMessage]):
@@ -374,14 +374,14 @@ def _deliver_input(actions : tuple[SimpleMessage]):
         elif _is_key_and_key_state_tuple(action):    # (key, state)
             inputs += _make_key_input(action[0], action[1])
         else:
-            raise DeliverMessageFail("Can not process unexpected (for Input) action type: %s." % type(action).__name__)
+            raise DeliverMessageFail(f"Can not process unexpected (for Input) action type: {type(action).__name__}.")
 
     length = len(inputs)
     raw_inputs = (_t.INPUT * length)(*inputs)  # ctypes requires specific type for array
 
     count = _t.SendInput(length, raw_inputs, _c.sizeof(_t.INPUT))
     if count != length:
-        raise DeliverMessageFail("Can not deliver all messages (for Input): %s. Delivered %d messages. " % (str(actions), count))
+        raise DeliverMessageFail(f"Can not deliver all messages (for Input): {str(actions)}. Delivered {count} messages. ")
 
 
 def _make_text_input(text : str) -> list[_t.INPUT]:
