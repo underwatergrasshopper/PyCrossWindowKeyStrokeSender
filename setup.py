@@ -13,7 +13,7 @@ setup(
     name                            = NAME, 
     version                         = VERSION,
     author                          = "underwatergrasshopper",
-    description                     = "Simple library for sending keystrokes to chosen window.",
+    description                     = "Simple library for sending keystrokes to any window.",
     long_description                = LONG_DESCRIPTION,
     long_description_content_type   = "text/markdown",
 
