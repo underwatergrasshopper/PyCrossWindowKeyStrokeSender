@@ -10,7 +10,7 @@ setlocal EnableDelayedExpansion
 set PYTHON_VERSION=%1
 
 if "!PYTHON_VERSION!" neq "" (
-    set PY_PYTHON_VERSION=-!PYTHON_VERSION!
+    set PYTHON_VERSION=-!PYTHON_VERSION!
 )
 
 set PYTHON_TAG=py311
