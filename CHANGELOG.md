@@ -1,3 +1,4 @@
+* Updated license.
 # v0.1.5 (12-10-2023)
 * Improved build scripts. 
 * Changed configure files.

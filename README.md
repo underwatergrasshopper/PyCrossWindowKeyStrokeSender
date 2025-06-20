@@ -22,6 +22,12 @@ Run `pip install PyCrossWindowKeyStrokeSender-<version>-py3-none-win_amd64.whl` 
 
 Run `pip uninstall PyCrossWindowKeyStrokeSender`.
 
+## Powershell Privileges for Testing
+
+```
+Set-ExecutionPolicy Unrestricted -Scope Process
+```
+
 # Message Delivery Method
 Library uses three message delivery methods: Input, Send, Post
 
