@@ -1,27 +1,30 @@
-from ctypes             import *
-from ctypes.wintypes    import *
+import ctypes           as _c
+import ctypes.wintypes  as _w
 
 ################################################################################
 # WinApi Macros
 ################################################################################
+
 def LOWORD(l):
     return l & 0xffff
     
+
 def HIWORD(l):
     return (l >> 16) & 0xffff
 
 ################################################################################
 # WinApi Constants
 ################################################################################
+
 NULL                    = None
 
 FALSE                   = 0
 TRUE                    = 1
 
-LONG_PTR                = LPARAM
+LONG_PTR                = _w.LPARAM
 LRESULT                 = LONG_PTR
 
-ULONG_PTR               = WPARAM
+ULONG_PTR               = _w.WPARAM
 
 SW_RESTORE              = 9
 
@@ -118,122 +121,153 @@ MAPVK_VK_TO_VSC         = 0
 ################################################################################
 
 ### SendInput ###
-class MOUSEINPUT(Structure):
+class MOUSEINPUT(_c.Structure):
     _fields_ = [
-        ("dx",          LONG),
-        ("dy",          LONG),
-        ("mouseData",   DWORD),
-        ("dwFlags",     DWORD),
-        ("time",        DWORD),
+        ("dx",          _w.LONG),
+        ("dy",          _w.LONG),
+        ("mouseData",   _w.DWORD),
+        ("dwFlags",     _w.DWORD),
+        ("time",        _w.DWORD),
         ("dwExtraInfo", ULONG_PTR),
     ]
 
 
-class KEYBDINPUT(Structure):
+class KEYBDINPUT(_c.Structure):
     _fields_ = [
-        ("wVk",         WORD),
-        ("wScan",       WORD),
-        ("dwFlags",     DWORD),
-        ("time",        DWORD),
+        ("wVk",         _w.WORD),
+        ("wScan",       _w.WORD),
+        ("dwFlags",     _w.DWORD),
+        ("time",        _w.DWORD),
         ("dwExtraInfo", ULONG_PTR),
     ]
 
-class HARDWAREINPUT(Structure):
+
+class HARDWAREINPUT(_c.Structure):
     _fields_ = [
-        ("uMsg",        DWORD),
-        ("wParamL",     WORD),
-        ("wParamH",     WORD),
+        ("uMsg",        _w.DWORD),
+        ("wParamL",     _w.WORD),
+        ("wParamH",     _w.WORD),
     ]
 
-class _INPUT_DUMMYUNIONNAME(Union):
+
+class _INPUT_DUMMYUNIONNAME(_c.Union):
     _fields_ = [
         ("mi",          MOUSEINPUT),
         ("ki",          KEYBDINPUT),
         ("hi",          HARDWAREINPUT),
     ]
 
-class INPUT(Structure):
+
+class INPUT(_c.Structure):
     _anonymous_ = ("DUMMYUNIONNAME",)
     _fields_ = [
-        ("type",            DWORD),
+        ("type",            _w.DWORD),
         ("DUMMYUNIONNAME",  _INPUT_DUMMYUNIONNAME),
     ]
 
-LPINPUT = POINTER(INPUT)
+
+LPINPUT = _c.POINTER(INPUT)
 
 ################################################################################
 # WinApi Functions
 ################################################################################
-GetLastError                        = windll.kernel32.GetLastError 
-GetLastError.restype                = DWORD 
 
-FindWindowA                         = windll.user32.FindWindowA 
-FindWindowA.argtypes                = [LPCSTR, LPCSTR]
-FindWindowA.restype                 = HWND 
-
-FindWindowW                         = windll.user32.FindWindowW 
-FindWindowW.argtypes                = [LPCWSTR, LPCWSTR]
-FindWindowW.restype                 = HWND
-
-IsIconic                            = windll.user32.IsIconic 
-IsIconic.argtypes                   = [HWND]
-IsIconic.restype                    = BOOL  
-
-ShowWindow                          = windll.user32.ShowWindow 
-ShowWindow.argtypes                 = [HWND, c_int]
-ShowWindow.restype                  = BOOL  
-
-GetForegroundWindow                 = windll.user32.GetForegroundWindow 
-GetForegroundWindow.restype         = HWND
-
-GetWindowThreadProcessId            = windll.user32.GetWindowThreadProcessId 
-GetWindowThreadProcessId.argtypes   = [HWND, LPDWORD]
-GetWindowThreadProcessId.restype    = DWORD 
+_kernel32   = _c.windll.kernel32
+_user32     = _c.windll.user32
 
 
-GetCurrentThreadId                  = windll.kernel32.GetCurrentThreadId 
-GetCurrentThreadId.restype          = DWORD 
+GetLastError                = _c.WINFUNCTYPE(_w.DWORD)(
+    ("GetLastError", _kernel32),
+    ()
+)
 
-AttachThreadInput                   = windll.user32.AttachThreadInput 
-AttachThreadInput.argtypes          = [DWORD, DWORD, BOOL]
-AttachThreadInput.restype           = BOOL 
+FindWindowA                 = _c.WINFUNCTYPE(_w.HWND, _w.LPCSTR, _w.LPCSTR)(
+    ("FindWindowA", _user32),
+    ((1, "lpClassName"), (1, "lpWindowName"))
+)
 
-SetForegroundWindow                 = windll.user32.SetForegroundWindow  
-SetForegroundWindow .argtypes       = [HWND]
-SetForegroundWindow .restype        = BOOL 
+FindWindowW                 = _c.WINFUNCTYPE(_w.HWND, _w.LPCWSTR, _w.LPCWSTR)(
+    ("FindWindowW", _user32),
+    ((1, "lpClassName"), (1, "lpWindowName"))
+)
 
-GetFocus                            = windll.user32.GetFocus  
-GetFocus.restype                    = HWND  
+IsIconic                    = _c.WINFUNCTYPE(_w.BOOL, _w.HWND)(
+    ("IsIconic", _user32),
+    ((1, "hWnd"),)
+)
 
-SetFocus                            = windll.user32.SetFocus  
-SetFocus .argtypes                  = [HWND]
-SetFocus.restype                    = HWND  
+ShowWindow                  = _c.WINFUNCTYPE(_w.BOOL, _w.HWND, _c.c_int)(
+    ("ShowWindow", _user32),
+    ((1, "hWnd"), (1, "nCmdShow"))
+)
 
-PostMessageA                        = windll.user32.PostMessageA 
-PostMessageA.argtypes               = [HWND, UINT, WPARAM, LPARAM]
-PostMessageA.restype                = BOOL 
+GetForegroundWindow         = _c.WINFUNCTYPE(_w.HWND)(
+    ("GetForegroundWindow", _user32),
+    ()
+)
 
-PostMessageW                        = windll.user32.PostMessageW 
-PostMessageW.argtypes               = [HWND, UINT, WPARAM, LPARAM]
-PostMessageW.restype                = BOOL 
 
-SendMessageA                        = windll.user32.SendMessageA 
-SendMessageA.argtypes               = [HWND, UINT, WPARAM, LPARAM]
-SendMessageA.restype                = LRESULT
+GetWindowThreadProcessId    = _c.WINFUNCTYPE(_w.DWORD, _w.HWND, _w.LPDWORD)(
+    ("GetWindowThreadProcessId", _user32),
+    ((1, "hWnd"), (1, "lpdwProcessId"))
+)
 
-SendMessageW                        = windll.user32.SendMessageW 
-SendMessageW.argtypes               = [HWND, UINT, WPARAM, LPARAM]
-SendMessageW.restype                = LRESULT 
+GetCurrentThreadId          = _c.WINFUNCTYPE(_w.HWND)(
+    ("GetCurrentThreadId", _kernel32),
+    ()
+)
 
-SendInput                           = windll.user32.SendInput 
-SendInput.argtypes                  = [UINT, LPINPUT, c_int]
-SendInput.restype                   = UINT  
+AttachThreadInput           = _c.WINFUNCTYPE(_w.BOOL, _w.DWORD, _w.DWORD, _w.BOOL)(
+    ("AttachThreadInput", _user32),
+    ((1, "idAttach"), (1, "idAttachTo"), (1, "fAttach"))
+)
 
-MapVirtualKeyA                      = windll.user32.MapVirtualKeyA 
-MapVirtualKeyA.argtypes             = [UINT, UINT]
-MapVirtualKeyA.restype              = UINT  
+SetForegroundWindow         = _c.WINFUNCTYPE(_w.BOOL, _w.HWND)(
+    ("SetForegroundWindow", _user32),
+    ((1, "hWnd"),)
+)
 
-MapVirtualKeyW                      = windll.user32.MapVirtualKeyW 
-MapVirtualKeyW.argtypes             = [UINT, UINT]
-MapVirtualKeyW.restype              = UINT  
+GetFocus                    = _c.WINFUNCTYPE(_w.HWND)(
+    ("GetFocus", _user32),
+    ()
+)
 
+SetFocus                    = _c.WINFUNCTYPE(_w.HWND, _w.HWND)(
+    ("SetFocus", _user32),
+    ((1, "hWnd"),)
+)
+
+PostMessageA                = _c.WINFUNCTYPE(_w.BOOL, _w.HWND, _w.UINT, _w.WPARAM, _w.LPARAM)(
+    ("PostMessageA", _user32),
+    ((1, "hWnd"), (1, "Msg"), (1, "wParam"), (1, "lParam"))
+)
+
+PostMessageW                = _c.WINFUNCTYPE(_w.BOOL, _w.HWND, _w.UINT, _w.WPARAM, _w.LPARAM)(
+    ("PostMessageW", _user32),
+    ((1, "hWnd"), (1, "Msg"), (1, "wParam"), (1, "lParam"))
+)
+
+SendMessageA                = _c.WINFUNCTYPE(LRESULT, _w.HWND, _w.UINT, _w.WPARAM, _w.LPARAM)(
+    ("SendMessageA", _user32),
+    ((1, "hWnd"), (1, "Msg"), (1, "wParam"), (1, "lParam"))
+)
+
+SendMessageW                = _c.WINFUNCTYPE(LRESULT, _w.HWND, _w.UINT, _w.WPARAM, _w.LPARAM)(
+    ("SendMessageW", _user32),
+    ((1, "hWnd"), (1, "Msg"), (1, "wParam"), (1, "lParam"))
+)
+
+SendInput                   = _c.WINFUNCTYPE(_w.UINT, _w.UINT, LPINPUT, _c.c_int)(
+    ("SendInput", _user32),
+    ((1, "cInputs"), (1, "pInputs"), (1, "cbSize"))
+)
+
+MapVirtualKeyA              = _c.WINFUNCTYPE(_w.UINT, _w.UINT, _w.UINT)(
+    ("MapVirtualKeyA", _user32),
+    ((1, "uCode"), (1, "uMapType"))
+)
+
+MapVirtualKeyW              = _c.WINFUNCTYPE(_w.UINT, _w.UINT, _w.UINT)(
+    ("MapVirtualKeyW", _user32),
+    ((1, "uCode"), (1, "uMapType"))
+)

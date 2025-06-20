@@ -8,6 +8,8 @@ from .Actions                   import *
 import time
 from enum                       import Enum
 
+import ctypes as _c
+
 __all__ = [
     "send_to_window",
 ]
@@ -350,7 +352,7 @@ def deliver_key(window, key, key_state, encoding_type_id, delivery_type_id):
     l_param_down  = 0x00000001 | (scan_code  << 16)
     l_param_up    = 0xC0000001 | (scan_code  << 16)
 
-    if is_ext_virtuel_key(vk_code):
+    if is_ext_virtual_key(vk_code):
         l_param_down    |= 1 << 24
         l_param_up      |= 1 << 24
 
@@ -398,7 +400,7 @@ def deliver_input(window, actions):
     length = len(inputs)
     raw_inputs = (INPUT * length)(*inputs)  # ctypes requires specific type for array
 
-    count = SendInput(length, raw_inputs, sizeof(INPUT))
+    count = SendInput(length, raw_inputs, _c.sizeof(INPUT))
     if count != length:
         raise DeliverMessageFail("Can not deliver all messages (for Input): %s. Delivered %d messages. " % (str(actions), count))
 
@@ -448,7 +450,7 @@ def make_key_input(key, key_state):
     vk_code       = key_to_vk_code(key)
     scan_code     = MapVirtualKeyW(vk_code, MAPVK_VK_TO_VSC)
 
-    ext_key_flag = KEYEVENTF_EXTENDEDKEY if is_ext_virtuel_key(vk_code) else 0
+    ext_key_flag = KEYEVENTF_EXTENDEDKEY if is_ext_virtual_key(vk_code) else 0
 
     if key_state & KeyState.DOWN:
         input = INPUT()
