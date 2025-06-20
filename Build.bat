@@ -7,6 +7,8 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+set PROJECT_PATH=%~dp0
+
 set PYTHON_VERSION=%1
 
 if "!PYTHON_VERSION!" neq "" (
@@ -15,4 +17,4 @@ if "!PYTHON_VERSION!" neq "" (
 
 set PYTHON_TAG=py311
 
-py !PYTHON_VERSION! -m build --wheel -C--build-option=--python-tag=!PYTHON_TAG! -C--build-option=--plat-name=win-amd64
+py !PYTHON_VERSION! -m build --wheel -C--build-option=--python-tag=!PYTHON_TAG! -C--build-option=--plat-name=win-amd64 %PROJECT_PATH%
