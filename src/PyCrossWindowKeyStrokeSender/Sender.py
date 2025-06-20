@@ -2,7 +2,7 @@ import ctypes as _c
 import ctypes.wintypes as _w
 import time as _time
 
-from ._Private import Types as _t
+from ._Private import WinApi as _WinApi
 from ._Private import ActionsSupport as _support
 from .Debug import debug_print as _debug_print
 from .Commons import to_utf16_codes as _to_utf16_codes
@@ -93,7 +93,7 @@ def send_to_window(target_window_name : str | bytes, *actions : Action):
 
     Raises: ArgumentFail, SetupFail, DeliverMessageFail, CleanupFail, FindTargetWindowFail.
     """
-    target_window = _t.NULL
+    target_window = _WinApi.NULL
 
     # b"..."                    -> ascii    (...A)
     # "...", u"...", U"..."     -> utf-16   (...W)
@@ -101,13 +101,13 @@ def send_to_window(target_window_name : str | bytes, *actions : Action):
     if isinstance(target_window_name, bytes):
         _debug_print("target_window_name ascii: ", target_window_name.decode("utf-8"))
 
-        target_window = _t.FindWindowA(_t.NULL, target_window_name)
+        target_window = _WinApi.FindWindowA(_WinApi.NULL, target_window_name)
 
         _debug_print("target_window handle: ", target_window)
     else:
         _debug_print("target_window_name utf-16: ", target_window_name)
 
-        target_window = _t.FindWindowW(_t.NULL, target_window_name)
+        target_window = _WinApi.FindWindowW(_WinApi.NULL, target_window_name)
 
         _debug_print("target_window handle: ", target_window)
 
@@ -118,22 +118,22 @@ def send_to_window(target_window_name : str | bytes, *actions : Action):
 
 ################################################################################
 
-def _send_to_window_by_handle(target_window : _t.HWND, actions : tuple[Action]):
-    foreground_window = _t.GetForegroundWindow()
+def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Action]):
+    foreground_window = _WinApi.GetForegroundWindow()
 
     _debug_print("foreground_window handle: ", foreground_window)
 
     if not foreground_window:
         raise SetupFail("Can not find foreground window.", True)
 
-    target_window_thread_id = _t.GetWindowThreadProcessId(target_window, _t.NULL)
+    target_window_thread_id = _WinApi.GetWindowThreadProcessId(target_window, _WinApi.NULL)
 
     _debug_print("target_window_thread_id handle: ", target_window_thread_id)
 
     if not target_window_thread_id:
        return SetupFail("Can not receive target window thread id.")
 
-    caller_window_thread_id = _t.GetCurrentThreadId()
+    caller_window_thread_id = _WinApi.GetCurrentThreadId()
 
     _debug_print("caller_window_thread_id handle: ", caller_window_thread_id)
 
@@ -141,7 +141,7 @@ def _send_to_window_by_handle(target_window : _t.HWND, actions : tuple[Action]):
        return SetupFail("Can not receive caller window thread id.")
 
     if target_window_thread_id and (target_window_thread_id is not caller_window_thread_id):
-        is_success = _t.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _t.TRUE)
+        is_success = _WinApi.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _WinApi.TRUE)
         
         if not is_success:
             return SetupFail("Can not attach caller window thread to target window thread.", True)
@@ -149,10 +149,10 @@ def _send_to_window_by_handle(target_window : _t.HWND, actions : tuple[Action]):
         try:
             _focus_and_send_messages(target_window, foreground_window, actions)
         except Exception:
-            _t.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _t.FALSE)
+            _WinApi.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _WinApi.FALSE)
             raise
 
-        is_success = _t.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _t.FALSE)
+        is_success = _WinApi.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _WinApi.FALSE)
 
         if not is_success:
             return CleanupFail("Can not detach caller window thread from target window thread.", True)
@@ -162,16 +162,16 @@ def _send_to_window_by_handle(target_window : _t.HWND, actions : tuple[Action]):
         _deliver_messages(target_window, actions)
     
 
-def _focus_and_send_messages(target_window : _t.HWND, foreground_window : _t.HWND, actions : tuple[Action]):
-    if _t.IsIconic(target_window):
-       _t.ShowWindow(target_window, _t.SW_RESTORE)
+def _focus_and_send_messages(target_window : _WinApi.HWND, foreground_window : _WinApi.HWND, actions : tuple[Action]):
+    if _WinApi.IsIconic(target_window):
+       _WinApi.ShowWindow(target_window, _WinApi.SW_RESTORE)
     
-    is_success = _t.SetForegroundWindow(target_window)
+    is_success = _WinApi.SetForegroundWindow(target_window)
     
     if not is_success:
         raise SetupFail("Can not set target window to be foreground window.", True)
 
-    focus_window = _t.GetFocus()
+    focus_window = _WinApi.GetFocus()
     
     _debug_print("focus_window: ", focus_window)
     
@@ -189,10 +189,10 @@ def _focus_and_send_messages(target_window : _t.HWND, foreground_window : _t.HWN
     if not is_success:
         raise SetupFail("Can not set previous foreground window back to be foreground window.", True)
     
-    _t.SetFocus(foreground_window)
+    _WinApi.SetFocus(foreground_window)
 
 
-def _try_set_foreground_window(window : _t.HWND, max_num_of_tries : int = 10, interval : float = 0.01) -> bool:
+def _try_set_foreground_window(window : _WinApi.HWND, max_num_of_tries : int = 10, interval : float = 0.01) -> bool:
     """
     interval
         In seconds.
@@ -200,7 +200,7 @@ def _try_set_foreground_window(window : _t.HWND, max_num_of_tries : int = 10, in
     num_of_tries_left = max_num_of_tries
 
     while num_of_tries_left:
-        if _t.SetForegroundWindow(window):
+        if _WinApi.SetForegroundWindow(window):
             _debug_print("max_num_of_tries left: ", num_of_tries_left)
             return True
 
@@ -215,7 +215,7 @@ def _is_key_and_key_state_tuple(action : Action) -> bool:
     return isinstance(action, tuple) and len(action) > 1 and isinstance(action[0], Key) and isinstance(action[1], int)
 
 
-def _deliver_messages(focus_window : _t.HWND, actions : tuple[Action]):
+def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action]):
     _debug_print("actions: ", *actions)
 
     encoding_type_id        = EncodingTypeID.UTF16
@@ -268,7 +268,7 @@ def _deliver_messages(focus_window : _t.HWND, actions : tuple[Action]):
             raise ArgumentFail(f"Can not process unexpected action type: {type(action).__name__}.")
 
 
-def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
+def _deliver_text(window : _WinApi.HWND, text : str, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
     _debug_print("encoding_type_id: ", encoding_type_id.name)
     _debug_print("delivery_type_id: ", delivery_type_id.name)
 
@@ -277,11 +277,11 @@ def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeI
 
         if delivery_type_id == DeliveryTypeID.SEND:
             for code in codes:
-                _t.SendMessageA(window, _t.WM_CHAR, code, 0)
+                _WinApi.SendMessageA(window, _WinApi.WM_CHAR, code, 0)
 
         elif delivery_type_id == DeliveryTypeID.POST:
             for code in codes:
-                if not _t.PostMessageA(window, _t.WM_CHAR, code, 0):
+                if not _WinApi.PostMessageA(window, _WinApi.WM_CHAR, code, 0):
                     raise DeliverMessageFail(f"Can not deliver ascii message: \"{text}\"")
         else:
             raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
@@ -291,11 +291,11 @@ def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeI
 
         if delivery_type_id == DeliveryTypeID.SEND:
             for code in codes:
-                _t.SendMessageW(window, _t.WM_CHAR, code, 0)
+                _WinApi.SendMessageW(window, _WinApi.WM_CHAR, code, 0)
 
         elif delivery_type_id == DeliveryTypeID.POST:
             for code in codes:
-                if not _t.PostMessageW(window, _t.WM_CHAR, code, 0):
+                if not _WinApi.PostMessageW(window, _WinApi.WM_CHAR, code, 0):
                     raise DeliverMessageFail(f"Can not deliver utf-16 message: \"{text}\"")
         else:
             raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
@@ -303,7 +303,7 @@ def _deliver_text(window : _t.HWND, text : str, encoding_type_id : EncodingTypeI
         raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
 
 
-def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
+def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding_type_id : EncodingTypeID, delivery_type_id : DeliveryTypeID):
     """
     key_state 
         Bitfield made from KeyState bit sets.
@@ -312,13 +312,13 @@ def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id 
     _debug_print("delivery_type_id: ", delivery_type_id.name)
 
     if encoding_type_id == EncodingTypeID.ASCII:
-        SendMessage     = _t.SendMessageA
-        PostMessage     = _t.PostMessageA
-        MapVirtualKey   = _t.MapVirtualKeyA
+        SendMessage     = _WinApi.SendMessageA
+        PostMessage     = _WinApi.PostMessageA
+        MapVirtualKey   = _WinApi.MapVirtualKeyA
     elif encoding_type_id == EncodingTypeID.UTF16:
-        SendMessage     = _t.SendMessageW
-        PostMessage     = _t.PostMessageW
-        MapVirtualKey   = _t.MapVirtualKeyW
+        SendMessage     = _WinApi.SendMessageW
+        PostMessage     = _WinApi.PostMessageW
+        MapVirtualKey   = _WinApi.MapVirtualKeyW
     else:
         raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
 
@@ -329,7 +329,7 @@ def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id 
         raise DeliverMessageFail(f"Can not deliver message with unsupported key: {key.name}. (use Input() instead)")
 
     vk_code       = _support.key_to_vk_code(key)
-    scan_code     = MapVirtualKey(vk_code, _t.MAPVK_VK_TO_VSC)
+    scan_code     = MapVirtualKey(vk_code, _WinApi.MAPVK_VK_TO_VSC)
 
     l_param_down  = 0x00000001 | (scan_code  << 16)
     l_param_up    = 0xC0000001 | (scan_code  << 16)
@@ -343,28 +343,28 @@ def _deliver_key(window : _t.HWND, key : Key, key_state : int, encoding_type_id 
     if delivery_type_id == DeliveryTypeID.SEND:
         if key_state & KeyState.DOWN:
             _debug_print("DOWN")
-            SendMessage(window, _t.WM_KEYDOWN, vk_code, l_param_down)
+            SendMessage(window, _WinApi.WM_KEYDOWN, vk_code, l_param_down)
 
         if key_state & KeyState.UP:
             _debug_print("UP")
-            SendMessage(window, _t.WM_KEYUP, vk_code, l_param_up)
+            SendMessage(window, _WinApi.WM_KEYUP, vk_code, l_param_up)
 
     elif delivery_type_id == DeliveryTypeID.POST:
         if key_state & KeyState.DOWN:
             _debug_print("DOWN")
-            if not PostMessage(window, _t.WM_KEYDOWN, vk_code, l_param_down):
+            if not PostMessage(window, _WinApi.WM_KEYDOWN, vk_code, l_param_down):
                 raise DeliverMessageFail(f"Can not post message: {_support.key_to_vk_code(key)} DOWN.")
 
         if key_state & KeyState.UP:
             _debug_print("UP")
-            if not PostMessage(window, _t.WM_KEYUP, vk_code, l_param_up):
+            if not PostMessage(window, _WinApi.WM_KEYUP, vk_code, l_param_up):
                 raise DeliverMessageFail(f"Can not post message: {_support.key_to_vk_code(key)} UP.")
     else:
         raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
 
 
 def _deliver_input(actions : tuple[SimpleMessage]):
-    inputs : list[_t.INPUT] = []
+    inputs : list[_WinApi.INPUT] = []
 
     for action in actions:
         if isinstance(action, (bytes, str)):        # text
@@ -377,37 +377,37 @@ def _deliver_input(actions : tuple[SimpleMessage]):
             raise DeliverMessageFail(f"Can not process unexpected (for Input) action type: {type(action).__name__}.")
 
     length = len(inputs)
-    raw_inputs = (_t.INPUT * length)(*inputs)  # ctypes requires specific type for array
+    raw_inputs = (_WinApi.INPUT * length)(*inputs)  # ctypes requires specific type for array
 
-    count = _t.SendInput(length, raw_inputs, _c.sizeof(_t.INPUT))
+    count = _WinApi.SendInput(length, raw_inputs, _c.sizeof(_WinApi.INPUT))
     if count != length:
         raise DeliverMessageFail(f"Can not deliver all messages (for Input): {str(actions)}. Delivered {count} messages. ")
 
 
-def _make_text_input(text : str) -> list[_t.INPUT]:
-    inputs : list[_t.INPUT] = []
+def _make_text_input(text : str) -> list[_WinApi.INPUT]:
+    inputs : list[_WinApi.INPUT] = []
 
     codes = _to_utf16_codes(text)
 
     for code in codes:
-        input = _t.INPUT()
+        input = _WinApi.INPUT()
 
-        input.type              = _t.INPUT_KEYBOARD
+        input.type              = _WinApi.INPUT_KEYBOARD
         input.ki.wVk            = 0
         input.ki.wScan          = code
         input.ki.time           = 0
-        input.ki.dwFlags        = _t.KEYEVENTF_UNICODE
+        input.ki.dwFlags        = _WinApi.KEYEVENTF_UNICODE
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]
 
-        input = _t.INPUT()
+        input = _WinApi.INPUT()
 
-        input.type              = _t.INPUT_KEYBOARD
+        input.type              = _WinApi.INPUT_KEYBOARD
         input.ki.wVk            = 0
         input.ki.wScan          = code
         input.ki.time           = 0
-        input.ki.dwFlags        = _t.KEYEVENTF_UNICODE | _t.KEYEVENTF_KEYUP
+        input.ki.dwFlags        = _WinApi.KEYEVENTF_UNICODE | _WinApi.KEYEVENTF_KEYUP
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]
@@ -415,33 +415,33 @@ def _make_text_input(text : str) -> list[_t.INPUT]:
     return inputs
 
 
-def _make_key_input(key : Key, key_state : KeyState) -> list[_t.INPUT]:
-    inputs : list[_t.INPUT] = []
+def _make_key_input(key : Key, key_state : KeyState) -> list[_WinApi.INPUT]:
+    inputs : list[_WinApi.INPUT] = []
 
     vk_code         = _support.key_to_vk_code(key)
-    scan_code       = _t.MapVirtualKeyW(vk_code, _t.MAPVK_VK_TO_VSC)
-    ext_key_flag    = _t.KEYEVENTF_EXTENDEDKEY if _support.is_ext_virtual_key(vk_code) else 0
+    scan_code       = _WinApi.MapVirtualKeyW(vk_code, _WinApi.MAPVK_VK_TO_VSC)
+    ext_key_flag    = _WinApi.KEYEVENTF_EXTENDEDKEY if _support.is_ext_virtual_key(vk_code) else 0
 
     if key_state & KeyState.DOWN:
-        input = _t.INPUT()
+        input = _WinApi.INPUT()
 
-        input.type              = _t.INPUT_KEYBOARD
+        input.type              = _WinApi.INPUT_KEYBOARD
         input.ki.wVk            = 0
         input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = _t.KEYEVENTF_SCANCODE | ext_key_flag
+        input.ki.dwFlags        = _WinApi.KEYEVENTF_SCANCODE | ext_key_flag
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]
 
     if key_state & KeyState.UP:
-        input = _t.INPUT()
+        input = _WinApi.INPUT()
 
-        input.type              = _t.INPUT_KEYBOARD
+        input.type              = _WinApi.INPUT_KEYBOARD
         input.ki.wVk            = 0
         input.ki.wScan          = scan_code
         input.ki.time           = 0
-        input.ki.dwFlags        = _t.KEYEVENTF_SCANCODE | _t.KEYEVENTF_KEYUP | ext_key_flag
+        input.ki.dwFlags        = _WinApi.KEYEVENTF_SCANCODE | _WinApi.KEYEVENTF_KEYUP | ext_key_flag
         input.ki.dwExtraInfo    = 0
 
         inputs += [input]

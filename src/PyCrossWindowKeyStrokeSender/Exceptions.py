@@ -1,5 +1,5 @@
 
-from ._Private import Types as _t
+from ._Private import WinApi as _WinApi
 
 
 class Fail(Exception):
@@ -10,7 +10,7 @@ class Fail(Exception):
 
         full_message = f"CWKSS Error: {message}"
         if is_last_winapi_error:
-            self._error_code = _t.GetLastError()
+            self._error_code = _WinApi.GetLastError()
             full_message += f" (windows error code: {self._error_code})"
 
         super().__init__(full_message)
