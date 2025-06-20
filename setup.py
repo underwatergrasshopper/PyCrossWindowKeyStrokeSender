@@ -24,5 +24,5 @@ setuptools.setup(
     packages                        = setuptools.find_packages(where = "src"),
     install_requires                = [],
     license                         = "MIT",
-    python_requires                 = "==3.11.*, ==3.12.*, ==3.13.*",
+    python_requires                 = "==3.11.*",
 )
