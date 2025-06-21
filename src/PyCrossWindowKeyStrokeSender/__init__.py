@@ -6,6 +6,6 @@ __version__ = (_Path(__file__).parent.resolve() / "version").read_text("utf-8").
 
 
 from .Sender        import send_to_window
-from .Actions       import Action, Message, SimpleMessage, Key, KeyState, Input, EncodingTypeID, DeliveryTypeID, Delay, Wait
+from .Actions       import Action, Message, SimpleMessage, Key, KeyState, Input, Encoding, Method, Delay, Wait
 from .Exceptions    import SetupFail, FindTargetWindowFail, CleanupFail, ArgumentFail, DeliverMessageFail
 from .Debug         import enable_debug

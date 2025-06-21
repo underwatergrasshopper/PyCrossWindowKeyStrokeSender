@@ -120,55 +120,50 @@ class KeyState:
     DOWN_AND_UP = DOWN | UP
 
 
-SimpleMessage : _TypeAlias = bytes | str | Key | tuple[Key, KeyState]
+Message : _TypeAlias = bytes | str | Key | tuple[Key, KeyState]
 
 
 class Input:
-    actions : tuple[SimpleMessage]
+    messages : tuple[Message]
 
-    def __init__(self, *actions : SimpleMessage):
-        self.actions = actions
-
-
-Message : _TypeAlias = SimpleMessage | Input
+    def __init__(self, *messages : Message):
+        self.messages = messages
 
 
-class DeliveryTypeID(_Enum):
+class Method(_Enum):
     """
-    Message delivery type.
+    Message delivery method.
     """
     SEND = 0
     POST = 1
+    INPUT = 1
 
-SEND    = DeliveryTypeID.SEND
-POST    = DeliveryTypeID.POST
+SEND    = Method.SEND
+POST    = Method.POST
+INPUT   = Method.INPUT
 
 
-class EncodingTypeID(_Enum):
+class Encoding(_Enum):
     """
-    Text message encoding format type.
+    Message encoding type.
     """
     ASCII   = 0
     UTF16   = 1
 
-ASCII   = EncodingTypeID.ASCII
-UTF16   = EncodingTypeID.UTF16
+ASCII   = Encoding.ASCII
+UTF16   = Encoding.UTF16
 
 
-class Wait:
-    def __init__(self, wait_time):
-        """
-        wait_time : float       Time to wait in seconds.
-        """
-        self.wait_time = wait_time
+_STR_TO_ENCODING_MAP = {
+    "ascii" : ASCII,
+    "utf-16" : UTF16,
+}
+
+def str_to_encoding(encoding : str) -> Encoding | None:
+    return _STR_TO_ENCODING_MAP.get(encoding, None)
 
 
-class Delay:
-    def __init__(self, delay_time):
-        """
-        delay_time : float      Delay time after sending each message in seconds.
-        """
-        self.delay_time = delay_time
+WaitTime : _TypeAlias = float | int
+"""Wait time in seconds."""
 
-
-Action : _TypeAlias = Message | DeliveryTypeID | EncodingTypeID | Wait | Delay
+Action : _TypeAlias = Message | WaitTime
