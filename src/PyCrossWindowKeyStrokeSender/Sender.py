@@ -1,14 +1,15 @@
 import ctypes as _c
-import ctypes.wintypes as _w
 import time as _time
-from typing import Literal, Protocol as _Protocol, TypeGuard
+from typing import Protocol as _Protocol
+from typing import Literal, TypeGuard
 
 from ._Private import WinApi as _WinApi
 from ._Private import ActionsSupport as _support
 from .Debug import debug_print as _debug_print
 from .Commons import to_utf16_codes as _to_utf16_codes
+from .Actions import str_to_encoding as _str_to_encoding
 
-from .Actions import Action, Message, WaitTime, Key, KeyState, Input, Encoding, Method, Wait, str_to_encoding
+from .Actions import Action, Message, WaitTime, Key, KeyState, Input, Encoding, Method
 from .Exceptions import SetupFail, FindTargetWindowFail, CleanupFail, ArgumentFail, DeliverMessageFail
 
 
@@ -134,7 +135,7 @@ def send_to_window(
     _debug_print("method: ", method.name)
     
     if isinstance(encoding, str):
-        encoding = str_to_encoding(encoding)
+        encoding = _str_to_encoding(encoding)
         if encoding == None:
             raise ValueError("Wrong value of 'encoding'.")
     elif not isinstance(encoding, Encoding):
@@ -175,7 +176,7 @@ def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Acti
             return SetupFail("Can not attach caller window thread to target window thread.", True)
 
         try:
-            _focus_and_send_messages(target_window, foreground_window, method, encoding)
+            _focus_and_send_messages(target_window, foreground_window, actions, method, encoding)
         except Exception:
             _WinApi.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _WinApi.FALSE)
             raise
@@ -187,7 +188,7 @@ def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Acti
     else:
         # When the target window is the caller window.
 
-        _deliver_messages(target_window, method, encoding)
+        _deliver_messages(target_window, actions, method, encoding)
     
 
 def _focus_and_send_messages(target_window : _WinApi.HWND, foreground_window : _WinApi.HWND, actions : tuple[Action], method : Method, encoding : Encoding):
@@ -269,10 +270,10 @@ def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], meth
 
     for action in inner_actions:
         if isinstance(action, bytes):               # text
-            _debug_print("deliver text message")
+            _debug_print("deliver text message (bytes)")
             _deliver_text(focus_window, action.decode(), encoding, method)
 
-        if isinstance(action, str):                 # text
+        elif isinstance(action, str):                 # text
             _debug_print("deliver text message")
             _deliver_text(focus_window, action, encoding, method)
 
@@ -292,7 +293,7 @@ def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], meth
             _debug_print("wait: ", action)
             _time.sleep(action)
         else:
-            raise ArgumentFail(f"Can not process unexpected action type: {type(action).__name__}.")
+            raise TypeError(f"Can not process unexpected action type: {type(action).__name__}.")
 
 
 def _deliver_text(window : _WinApi.HWND, text : str, encoding_type_id : Encoding, delivery_type_id : Method):
@@ -417,7 +418,6 @@ def _make_text_input(text : str) -> list[_WinApi.INPUT]:
     inputs : list[_WinApi.INPUT] = []
 
     codes = _to_utf16_codes(text)
-
     for code in codes:
         input = _WinApi.INPUT()
 

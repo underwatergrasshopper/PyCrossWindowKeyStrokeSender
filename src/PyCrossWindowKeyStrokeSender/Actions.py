@@ -124,9 +124,9 @@ Message : _TypeAlias = bytes | str | Key | tuple[Key, KeyState]
 
 
 class Input:
-    messages : tuple[Message]
+    messages : list[Message]
 
-    def __init__(self, *messages : Message):
+    def __init__(self, messages : list[Message]):
         self.messages = messages
 
 
@@ -134,9 +134,9 @@ class Method(_Enum):
     """
     Message delivery method.
     """
-    SEND = 0
-    POST = 1
-    INPUT = 1
+    SEND    = 0
+    POST    = 1
+    INPUT   = 2
 
 SEND    = Method.SEND
 POST    = Method.POST

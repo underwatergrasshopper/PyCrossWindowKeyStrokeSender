@@ -97,26 +97,32 @@ if __name__ == "__main__":
         if False:
             cwkss.send_to_window(
                 "Untitled - Notepad", 
-                cwkss.Input("Some Text.\nOther text.\n"),
-                cwkss.Wait(0.1))
+                "Some Text.\nOther text.\n",
+                0.1
+            )
 
         # Input Example 2
         if False:
+            # Note: Enters as text won't work.
             cwkss.send_to_window(
-                "Untitled - Notepad", 
-                cwkss.Input(U"Some Text.\nOther text.\nф𤭢\n"),
-                cwkss.Wait(0.1))
+                "*new 41 - Notepad++", 
+                U"Some Text.\r\nOther text.\r\nф𤭢\n",
+                1)
         
         # Input Example 3
         if False:
             cwkss.send_to_window(
-                "Untitled - Notepad", 
-                cwkss.Input(
-                    "Some Text.",
-                    cwkss.Key.ENTER,
-                    "Other Text.",
-                    cwkss.Key.ENTER),
-                cwkss.Wait(0.1))
+                "*new 41 - Notepad++", 
+                "Some Text.",
+                cwkss.Key.ENTER,
+                "Other Text.",
+                cwkss.Key.ENTER,
+                "ф𤭢",
+                0.2)
+            
+        # Input Example 3.5
+        if True:
+            cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, 0.05)
 
         # Input Example 4
         if False:
