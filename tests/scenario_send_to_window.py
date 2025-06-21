@@ -110,19 +110,19 @@ if __name__ == "__main__":
                 1)
         
         # Input Example 3
-        if False:
+        if True:
             cwkss.send_to_window(
-                "*new 41 - Notepad++", 
+                "Untitled - Notepad", 
                 "Some Text.",
                 cwkss.Key.ENTER,
                 "Other Text.",
                 cwkss.Key.ENTER,
                 "ф𤭢",
-                0.2)
+                method = cwkss.Method.SEND)
             
         # Input Example 3.5
-        if True:
-            cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, 0.05)
+        if False:
+            cwkss.send_to_window("Path of Exile", cwkss.Key.ENTER, "/kills", cwkss.Key.ENTER, delay = 0.05)
 
         # Input Example 4
         if False:

@@ -1,5 +1,6 @@
 * Added support for python 3.11.
 * Updated license.
+* Changed send_to_window and dependencies.
 * Removed support for python 3.9.
 # v0.1.5 (12-10-2023)
 * Improved build scripts. 

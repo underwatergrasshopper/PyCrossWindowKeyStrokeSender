@@ -21,6 +21,7 @@ class SupportsStr(_Protocol):
 def send_to_window(
         target_window_name  : bytes | str | SupportsStr, 
         *actions            : Action, 
+        delay               : int | float                               = 0,
         method              : Method                                    = Method.INPUT, 
         encoding            : Literal["ascii", "utf-16"] | Encoding     = Encoding.UTF16
             ):
@@ -129,6 +130,9 @@ def send_to_window(
     if not target_window:
         raise FindTargetWindowFail(target_window_name, True)
     
+    if not isinstance(delay, (float, int)):
+        raise TypeError("Wrong type of 'delay'.")
+
     if not isinstance(method, Method):
         raise TypeError("Wrong type of 'method'.")
     
@@ -143,11 +147,11 @@ def send_to_window(
     
     _debug_print("encoding: ", encoding.name)
 
-    _send_to_window_by_handle(target_window, actions, method, encoding)
+    _send_to_window_by_handle(target_window, actions, delay, method, encoding)
 
 ################################################################################
 
-def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Action], method : Method, encoding : Encoding):
+def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Action], delay : float | int, method : Method, encoding : Encoding):
     foreground_window = _WinApi.GetForegroundWindow()
 
     _debug_print("foreground_window handle: ", foreground_window)
@@ -176,7 +180,7 @@ def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Acti
             return SetupFail("Can not attach caller window thread to target window thread.", True)
 
         try:
-            _focus_and_send_messages(target_window, foreground_window, actions, method, encoding)
+            _focus_and_send_messages(target_window, foreground_window, actions, delay, method, encoding)
         except Exception:
             _WinApi.AttachThreadInput(caller_window_thread_id, target_window_thread_id, _WinApi.FALSE)
             raise
@@ -188,10 +192,10 @@ def _send_to_window_by_handle(target_window : _WinApi.HWND, actions : tuple[Acti
     else:
         # When the target window is the caller window.
 
-        _deliver_messages(target_window, actions, method, encoding)
+        _deliver_messages(target_window, actions, delay, method, encoding)
     
 
-def _focus_and_send_messages(target_window : _WinApi.HWND, foreground_window : _WinApi.HWND, actions : tuple[Action], method : Method, encoding : Encoding):
+def _focus_and_send_messages(target_window : _WinApi.HWND, foreground_window : _WinApi.HWND, actions : tuple[Action], delay : float | int, method : Method, encoding : Encoding):
     if _WinApi.IsIconic(target_window):
        _WinApi.ShowWindow(target_window, _WinApi.SW_RESTORE)
     
@@ -208,7 +212,7 @@ def _focus_and_send_messages(target_window : _WinApi.HWND, foreground_window : _
         SetupFail("Can not get window with keyboard focus.", True)
 
     try:
-        _deliver_messages(focus_window, actions, method, encoding)
+        _deliver_messages(focus_window, actions, delay, method, encoding)
     except Exception:
         _try_set_foreground_window(foreground_window)
         raise
@@ -263,7 +267,7 @@ def _convert_messages_to_inputs(actions : tuple[Action]) -> tuple[Input | WaitTi
     return inner_actions
 
 
-def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], method : Method, encoding : Encoding):
+def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], delay : float | int,  method : Method, encoding : Encoding):
     _debug_print("actions: ", *actions)
 
     inner_actions : Input | Action = _convert_messages_to_inputs(actions) if method == Method.INPUT else actions
@@ -273,21 +277,31 @@ def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], meth
             _debug_print("deliver text message (bytes)")
             _deliver_text(focus_window, action.decode(), encoding, method)
 
-        elif isinstance(action, str):                 # text
+            if delay: _time.sleep(delay)
+
+        elif isinstance(action, str):               # text
             _debug_print("deliver text message")
             _deliver_text(focus_window, action, encoding, method)
+
+            if delay: _time.sleep(delay)
 
         elif isinstance(action, Key):               # key
             _debug_print("deliver key message: ", action.name)
             _deliver_key(focus_window, action, KeyState.DOWN_AND_UP, encoding, method)
+
+            if delay: _time.sleep(delay)
              
         elif _is_key_and_key_state_tuple(action):   # (key, state)
             _debug_print("deliver key message: ", action[0].name)
             _deliver_key(focus_window, action[0], action[1], encoding, method)
 
+            if delay: _time.sleep(delay)
+
         elif isinstance(action, Input):             # input
             _debug_print("deliver input message: ", action.messages)
             _deliver_input(action.messages)
+
+            if delay: _time.sleep(delay)
 
         elif isinstance(action, (int, float)):      # wait
             _debug_print("wait: ", action)
@@ -296,59 +310,59 @@ def _deliver_messages(focus_window : _WinApi.HWND, actions : tuple[Action], meth
             raise TypeError(f"Can not process unexpected action type: {type(action).__name__}.")
 
 
-def _deliver_text(window : _WinApi.HWND, text : str, encoding_type_id : Encoding, delivery_type_id : Method):
-    _debug_print("encoding_type_id: ", encoding_type_id.name)
-    _debug_print("delivery_type_id: ", delivery_type_id.name)
+def _deliver_text(window : _WinApi.HWND, text : str, encoding : Encoding, method : Method):
+    _debug_print("encoding: ", encoding.name)
+    _debug_print("method: ", method.name)
 
-    if encoding_type_id == Encoding.ASCII:
+    if encoding == Encoding.ASCII:
         codes = text.encode("utf-8")
 
-        if delivery_type_id == Method.SEND:
+        if method == Method.SEND:
             for code in codes:
                 _WinApi.SendMessageA(window, _WinApi.WM_CHAR, code, 0)
 
-        elif delivery_type_id == Method.POST:
+        elif method == Method.POST:
             for code in codes:
                 if not _WinApi.PostMessageA(window, _WinApi.WM_CHAR, code, 0):
                     raise DeliverMessageFail(f"Can not deliver ascii message: \"{text}\"")
         else:
-            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
+            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{method.name}\".")
 
-    elif encoding_type_id == Encoding.UTF16:
+    elif encoding == Encoding.UTF16:
         codes = _to_utf16_codes(text)
 
-        if delivery_type_id == Method.SEND:
+        if method == Method.SEND:
             for code in codes:
                 _WinApi.SendMessageW(window, _WinApi.WM_CHAR, code, 0)
 
-        elif delivery_type_id == Method.POST:
+        elif method == Method.POST:
             for code in codes:
                 if not _WinApi.PostMessageW(window, _WinApi.WM_CHAR, code, 0):
                     raise DeliverMessageFail(f"Can not deliver utf-16 message: \"{text}\"")
         else:
-            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
+            raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{method.name}\".")
     else:
-        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
+        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding.name}\".")
 
 
-def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding_type_id : Encoding, delivery_type_id : Method):
+def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding : Encoding, method : Method):
     """
     key_state 
         Bitfield made from KeyState bit sets.
     """
-    _debug_print("encoding_type_id: ", encoding_type_id.name)
-    _debug_print("delivery_type_id: ", delivery_type_id.name)
+    _debug_print("encoding: ", encoding.name)
+    _debug_print("method: ", method.name)
 
-    if encoding_type_id == Encoding.ASCII:
+    if encoding == Encoding.ASCII:
         SendMessage     = _WinApi.SendMessageA
         PostMessage     = _WinApi.PostMessageA
         MapVirtualKey   = _WinApi.MapVirtualKeyA
-    elif encoding_type_id == Encoding.UTF16:
+    elif encoding == Encoding.UTF16:
         SendMessage     = _WinApi.SendMessageW
         PostMessage     = _WinApi.PostMessageW
         MapVirtualKey   = _WinApi.MapVirtualKeyW
     else:
-        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding_type_id.name}\".")
+        raise DeliverMessageFail(f"Can not process unsupported encoding format: \"{encoding.name}\".")
 
     if key in [Key.ALT, Key.LALT, Key.RALT]:
         # Note: Alt (especially right Alt) keystroke sends more than WM_KEYDOWN and WM_KEYUP message.
@@ -368,7 +382,7 @@ def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding_typ
 
     vk_code = _support.vk_code_to_sideless(vk_code)
 
-    if delivery_type_id == Method.SEND:
+    if method == Method.SEND:
         if key_state & KeyState.DOWN:
             _debug_print("DOWN")
             SendMessage(window, _WinApi.WM_KEYDOWN, vk_code, l_param_down)
@@ -377,7 +391,7 @@ def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding_typ
             _debug_print("UP")
             SendMessage(window, _WinApi.WM_KEYUP, vk_code, l_param_up)
 
-    elif delivery_type_id == Method.POST:
+    elif method == Method.POST:
         if key_state & KeyState.DOWN:
             _debug_print("DOWN")
             if not PostMessage(window, _WinApi.WM_KEYDOWN, vk_code, l_param_down):
@@ -388,7 +402,7 @@ def _deliver_key(window : _WinApi.HWND, key : Key, key_state : int, encoding_typ
             if not PostMessage(window, _WinApi.WM_KEYUP, vk_code, l_param_up):
                 raise DeliverMessageFail(f"Can not post message: {_support.key_to_vk_code(key)} UP.")
     else:
-        raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{delivery_type_id.name}\".")
+        raise DeliverMessageFail(f"Can not process unsupported delivery method: \"{method.name}\".")
 
 
 def _deliver_input(messages : list[Message]):

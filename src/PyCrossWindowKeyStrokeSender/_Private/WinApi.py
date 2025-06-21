@@ -28,6 +28,7 @@ ULONG_PTR               = _w.WPARAM
 HWND                    = _w.HWND
 
 SW_RESTORE              = 9
+SW_SHOW                 = 3
 
 WM_CHAR                 = 0x0102
 WM_KEYDOWN              = 0x0100
@@ -205,6 +206,11 @@ ShowWindow                  = _c.WINFUNCTYPE(_w.BOOL, _w.HWND, _c.c_int)(
 GetForegroundWindow         = _c.WINFUNCTYPE(_w.HWND)(
     ("GetForegroundWindow", _user32),
     ()
+)
+
+SetActiveWindow             = _c.WINFUNCTYPE(_w.HWND, _w.HWND)(
+    ("SetActiveWindow", _user32),
+    ((1, "hWnd"),)
 )
 
 
